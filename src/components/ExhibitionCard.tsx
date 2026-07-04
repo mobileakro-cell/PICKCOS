@@ -24,31 +24,34 @@ export default function ExhibitionCard({
   return (
     <Link
       href={`/exhibitions/${id}`}
-      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 group border border-gray-100"
+      className="border-2 border-x-transparent border-y-[var(--color-border)] bg-surface group hover:border-y-[var(--color-hover-border)] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300"
     >
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <img
           src={image}
           alt={title}
-          className="w-full h-52 object-cover bg-gray-50 group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-52 object-cover bg-neutral-50 group-hover:scale-105 transition-transform duration-500"
         />
-        <span className={`absolute top-4 right-4 px-3 py-1 text-xs font-medium rounded-full ${
+        <span className={`absolute top-3 right-3 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ${
           status === 'upcoming'
-            ? 'bg-white text-gray-900'
-            : 'bg-gray-100 text-gray-500'
+            ? 'bg-theme-400 text-white'
+            : 'bg-neutral-50 text-neutral-400'
         }`}>
           {status === 'upcoming' ? 'Upcoming' : 'Past'}
         </span>
+        <span className="absolute top-3 left-3 px-2.5 py-1 bg-[var(--foreground)]/80 text-[var(--background)] text-[11px] font-semibold uppercase tracking-wider">
+          {region}
+        </span>
       </div>
-      <div className="p-6">
-        <p className="text-sm text-gray-400 mb-2">{dateRange}</p>
-        <h3 className="font-bold text-lg mb-3 text-gray-900 group-hover:text-gray-600 transition-colors line-clamp-2">
+      <div className="p-5">
+        <p className="text-[13px] text-[var(--color-sub-text)] mb-2">{dateRange}</p>
+        <h3 className="font-semibold text-[18px] mb-3 text-[var(--foreground)] group-hover:text-[var(--color-theme-600)] transition-colors line-clamp-2 leading-[1.35]">
           {title}
         </h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-[15px] text-neutral-400 mb-4 font-medium">
           {location}
         </p>
-        <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">
+        <p className="text-[15px] text-neutral-400 line-clamp-2 leading-[1.5] font-normal">
           {description}
         </p>
       </div>

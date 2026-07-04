@@ -7,60 +7,41 @@ export default function Footer() {
   const { t } = useLanguage()
 
   return (
-    <footer className="bg-white border-t border-gray-100 mt-24">
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          {/* Company */}
+    <footer className="w-full bg-surface text-[var(--foreground)] border-t border-[var(--color-border)]">
+      <div className="mx-auto w-full max-w-[1248px] px-6 pt-10 pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-16 items-start">
+          {/* Left: Logo + Nav */}
           <div>
-            <img src="/logo.svg" alt="PICKCOS" className="h-6 w-auto mb-6" />
-            <p className="text-sm leading-relaxed text-gray-500">
-              {t('footer.description')}
-            </p>
+            <div className="text-[18px] font-extrabold tracking-[0.12em] mb-6">PICKCOS</div>
+            <div className="flex flex-wrap gap-5">
+              <Link href="/sourcing" className="text-[15px] font-medium tracking-[-0.01em] text-neutral-400 hover:text-[var(--foreground)] transition-colors">{t('footer.browse_suppliers')}</Link>
+              <Link href="/exhibitions" className="text-[15px] font-medium tracking-[-0.01em] text-neutral-400 hover:text-[var(--foreground)] transition-colors">Exhibitions</Link>
+              <Link href="/news" className="text-[15px] font-medium tracking-[-0.01em] text-neutral-400 hover:text-[var(--foreground)] transition-colors">News</Link>
+              <Link href="/about" className="text-[15px] font-medium tracking-[-0.01em] text-neutral-400 hover:text-[var(--foreground)] transition-colors">About</Link>
+            </div>
           </div>
 
-          {/* Explore */}
-          <div>
-            <h4 className="text-gray-900 font-medium mb-6 text-xs uppercase tracking-[0.15em]">{t('footer.explore')}</h4>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/sourcing" className="text-gray-500 hover:text-gray-900 transition-colors">{t('footer.browse_suppliers')}</Link></li>
-              <li><Link href="/exhibitions" className="text-gray-500 hover:text-gray-900 transition-colors">Exhibitions</Link></li>
-              <li><Link href="/news" className="text-gray-500 hover:text-gray-900 transition-colors">News</Link></li>
-              <li><Link href="/about" className="text-gray-500 hover:text-gray-900 transition-colors">About Us</Link></li>
-            </ul>
-          </div>
+          {/* Center: Divider */}
+          <div className="hidden md:block w-[1px] h-full bg-neutral-100" />
 
-          {/* For Buyers */}
+          {/* Right: Contact */}
           <div>
-            <h4 className="text-gray-900 font-medium mb-6 text-xs uppercase tracking-[0.15em]">{t('footer.for_buyers')}</h4>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/request-matching" className="text-gray-500 hover:text-gray-900 transition-colors">{t('footer.get_matched')}</Link></li>
-              <li><Link href="/contact" className="text-gray-500 hover:text-gray-900 transition-colors">{t('footer.contact_us')}</Link></li>
-              <li><a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">{t('footer.faq')}</a></li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-gray-900 font-medium mb-6 text-xs uppercase tracking-[0.15em]">{t('footer.get_in_touch')}</h4>
-            <ul className="space-y-3 text-sm">
-              <li><a href="mailto:hello@pickcos.com" className="text-gray-500 hover:text-gray-900 transition-colors">hello@pickcos.com</a></li>
-              <li><a href="tel:+82-2-1234-5678" className="text-gray-500 hover:text-gray-900 transition-colors">+82-2-1234-5678</a></li>
-              <li className="pt-2">
-                <p className="text-gray-400 text-xs">Mon-Fri: 9AM-6PM KST</p>
-              </li>
-            </ul>
+            <p className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[var(--color-sub-text)] mb-4">{t('footer.get_in_touch')}</p>
+            <div className="text-[14px] leading-[1.65] text-neutral-400 space-y-1.5">
+              <p><a href="mailto:hello@pickcos.com" className="hover:text-[var(--foreground)] transition-colors">hello@pickcos.com</a></p>
+              <p><a href="tel:+82-2-1234-5678" className="hover:text-[var(--foreground)] transition-colors">+82-2-1234-5678</a></p>
+              <p className="text-[var(--color-sub-text)] mt-3">Mon–Fri: 9AM–6PM KST</p>
+            </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-gray-100 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-400 gap-6">
-            <p>&copy; 2026 PICKCOS. All rights reserved.</p>
-            <div className="flex gap-6 flex-wrap justify-center md:justify-end">
-              <a href="#" className="hover:text-gray-900 transition-colors">{t('footer.privacy')}</a>
-              <a href="#" className="hover:text-gray-900 transition-colors">{t('footer.terms')}</a>
-              <Link href="/admin" className="hover:text-gray-900 transition-colors">{t('footer.admin')}</Link>
-            </div>
+        {/* Bottom */}
+        <div className="border-t border-neutral-100 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] text-[var(--color-sub-text)] gap-4">
+          <p>&copy; 2026 PICKCOS. All rights reserved.</p>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-[var(--foreground)] transition-colors">{t('footer.privacy')}</a>
+            <a href="#" className="hover:text-[var(--foreground)] transition-colors">{t('footer.terms')}</a>
+            <Link href="/admin" className="hover:text-[var(--foreground)] transition-colors">{t('footer.admin')}</Link>
           </div>
         </div>
       </div>

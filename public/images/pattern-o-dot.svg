@@ -1,0 +1,6 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- O shape -->
+  <circle cx="60" cy="65" r="28" stroke="currentColor" stroke-width="5" fill="none" opacity="0.08"/>
+  <!-- Dot above O -->
+  <circle cx="60" cy="25" r="6" fill="currentColor" opacity="0.08"/>
+</svg>

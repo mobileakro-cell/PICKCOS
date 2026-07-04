@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { listAll, insertOne } from '@/lib/db'
+import { getAdmin } from '@/lib/auth'
 
 interface MatchingRequest {
   id: string
@@ -19,8 +21,6 @@ interface MatchingRequest {
   topic?: string
   createdAt: string
 }
-
-const matchingRequests: MatchingRequest[] = []
 
 export async function POST(request: NextRequest) {
   try {
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     }
 
-    matchingRequests.push(newRequest)
+    await insertOne('matchingRequest', newRequest, requestId)
 
     return NextResponse.json(
       { requestId },
@@ -100,16 +100,15 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  if (!getAdmin(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const searchParams = request.nextUrl.searchParams
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const recent = matchingRequests.slice(-limit).reverse()
+    const all = await listAll<MatchingRequest>('matchingRequest')
+    const recent = all.slice(-limit).reverse()
 
-    return NextResponse.json({
-      items: recent,
-      total: matchingRequests.length,
-    })
+    return NextResponse.json({ items: recent, total: all.length })
   } catch (error) {
     console.error('Error fetching matching requests:', error)
     return NextResponse.json(

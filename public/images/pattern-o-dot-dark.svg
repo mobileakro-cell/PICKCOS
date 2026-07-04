@@ -1,0 +1,6 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- O shape - dark color for light background -->
+  <circle cx="20" cy="24" r="10" stroke="#3D3D3B" stroke-width="1.5" fill="none"/>
+  <!-- Dot above O -->
+  <circle cx="20" cy="8" r="3" fill="#3D3D3B"/>
+</svg>

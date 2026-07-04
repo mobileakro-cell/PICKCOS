@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mockSuppliers, addSupplier, updateSupplier, deleteSupplier } from '@/lib/mock'
-import { REGION_MAP } from '@/lib/types'
+import { getSuppliers, createSupplier, editSupplier, removeSupplier } from '@/lib/db'
+import { REGION_MAP, type Supplier } from '@/lib/types'
+import { getAdmin } from '@/lib/auth'
+
+const unauthorized = () => NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
 // Helper function for efficient filtering
 const matchesRegion = (exportMarkets: string[], region: string): boolean => {
@@ -12,7 +15,7 @@ const matchesRegion = (exportMarkets: string[], region: string): boolean => {
 }
 
 // Helper function for search with early termination (searches both en/ko)
-const matchesSearch = (supplier: typeof mockSuppliers[0], query: string): boolean => {
+const matchesSearch = (supplier: Supplier, query: string): boolean => {
   const lowerQuery = query.toLowerCase()
   return (
     supplier.name.toLowerCase().includes(lowerQuery) ||
@@ -25,8 +28,8 @@ const matchesSearch = (supplier: typeof mockSuppliers[0], query: string): boolea
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  
-  let items = [...mockSuppliers]
+
+  let items = await getSuppliers()
   
   // Category filter
   const category = searchParams.get('category')
@@ -39,7 +42,16 @@ export async function GET(request: NextRequest) {
   if (region && region !== 'all') {
     items = items.filter((s) => matchesRegion(s.exportMarkets, region))
   }
-  
+
+  // Product category filter (multi-select, comma-separated) — match ANY
+  const productsParam = searchParams.get('products')
+  if (productsParam) {
+    const wanted = productsParam.split(',').filter(Boolean)
+    if (wanted.length) {
+      items = items.filter((s) => (s.productCategories || []).some((pc) => wanted.includes(pc)))
+    }
+  }
+
   // Search filter
   const q = searchParams.get('q')
   if (q) {
@@ -62,25 +74,28 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!getAdmin(request)) return unauthorized()
   const body = await request.json()
-  const supplier = addSupplier(body)
+  const supplier = await createSupplier(body)
   return NextResponse.json(supplier, { status: 201 })
 }
 
 export async function PUT(request: NextRequest) {
+  if (!getAdmin(request)) return unauthorized()
   const body = await request.json()
   const { id, ...data } = body
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const updated = updateSupplier(id, data)
+  const updated = await editSupplier(id, data)
   if (!updated) return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
   return NextResponse.json(updated)
 }
 
 export async function DELETE(request: NextRequest) {
+  if (!getAdmin(request)) return unauthorized()
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const deleted = deleteSupplier(id)
+  const deleted = await removeSupplier(id)
   if (!deleted) return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
   return NextResponse.json({ success: true })
 }

@@ -1,58 +1,33 @@
-import { NextResponse } from 'next/server'
-import fs from 'fs'
-import path from 'path'
+import { NextRequest, NextResponse } from 'next/server'
+import { getOne, upsertOne } from '@/lib/db'
+import { getAdmin } from '@/lib/auth'
 
-const settingsPath = path.join(process.cwd(), 'data', 'settings.json')
+const SETTINGS_ID = 'site'
 
 const defaultSettings = {
   heroBackgroundImage: '/images/bg-hero.svg',
   heroTitle: 'WHERE K-BEAUTY\nMEETS THE\nWORLD',
   heroSubtitle: 'K-Beauty Media Platform',
-  heroDescription: 'Connecting Korean beauty brands with global markets through stories, insights, and partnerships. Your trusted media bridge to K-Beauty innovation.'
+  heroDescription:
+    'Connecting Korean beauty brands with global markets through stories, insights, and partnerships. Your trusted media bridge to K-Beauty innovation.',
 }
 
-function getSettings() {
-  try {
-    if (fs.existsSync(settingsPath)) {
-      const data = fs.readFileSync(settingsPath, 'utf-8')
-      return { ...defaultSettings, ...JSON.parse(data) }
-    }
-  } catch (error) {
-    console.error('Error reading settings:', error)
-  }
-  return defaultSettings
-}
-
-function saveSettings(settings: any) {
-  try {
-    const dir = path.dirname(settingsPath)
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
-    }
-    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2))
-    return true
-  } catch (error) {
-    console.error('Error saving settings:', error)
-    return false
-  }
+async function getSettings() {
+  const saved = await getOne<Record<string, any>>('setting', SETTINGS_ID)
+  return { ...defaultSettings, ...(saved || {}) }
 }
 
 export async function GET() {
-  const settings = getSettings()
-  return NextResponse.json(settings)
+  return NextResponse.json(await getSettings())
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  if (!getAdmin(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const body = await request.json()
-    const currentSettings = getSettings()
-    const newSettings = { ...currentSettings, ...body }
-    
-    if (saveSettings(newSettings)) {
-      return NextResponse.json({ success: true, settings: newSettings })
-    } else {
-      return NextResponse.json({ success: false, error: 'Failed to save settings' }, { status: 500 })
-    }
+    const newSettings = { ...(await getSettings()), ...body }
+    await upsertOne('setting', SETTINGS_ID, newSettings)
+    return NextResponse.json({ success: true, settings: newSettings })
   } catch (error) {
     return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 })
   }

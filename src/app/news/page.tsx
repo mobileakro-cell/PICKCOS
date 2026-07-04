@@ -66,30 +66,32 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
+    <div className="min-h-screen bg-[var(--background)]">
       {/* Hero */}
-      <section className="bg-white py-20 border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 tracking-tight">{t('news.title')}</h1>
-          <p className="text-base text-gray-500 font-light">
+      <section className="pt-20 pb-12" style={{ background: 'var(--background)' }}>
+        <div className="max-w-[1248px] mx-auto px-6 md:px-24 text-center">
+          <div className="page-title-reveal">
+            <h1 className="text-[38px] font-bold tracking-[-0.02em] mb-3 text-[var(--foreground)]">{t('news.title')}</h1>
+          </div>
+          <p className="page-title-subtitle text-base text-neutral-400 font-light">
             {t('news.subtitle')}
           </p>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-16">
+      <div className="max-w-[1248px] mx-auto px-6 md:px-24 py-16">
         {/* Filters */}
         <div className="mb-12">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 block">{t('news.category')}</label>
+              <label className="text-[18px] font-semibold text-[var(--foreground)] mb-4 block">{t('news.category')}</label>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedCategory('all')}
-                  className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all ${
+                  className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all rounded-md ${
                     selectedCategory === 'all'
-                      ? 'bg-[#3d3d3d] text-white'
-                      : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                      ? 'bg-[var(--foreground)] text-[var(--background)] font-semibold'
+                      : 'border border-[var(--color-border)] text-neutral-400 hover:border-[var(--color-hover-border)]'
                   }`}
                 >
                   {t('news.all')}
@@ -98,10 +100,10 @@ export default function NewsPage() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all ${
+                    className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all rounded-md ${
                       selectedCategory === cat
-                        ? 'bg-[#3d3d3d] text-white'
-                        : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                        ? 'bg-[var(--foreground)] text-[var(--background)] font-semibold'
+                        : 'border border-[var(--color-border)] text-neutral-400 hover:border-[var(--color-hover-border)]'
                     }`}
                   >
                     {cat}
@@ -111,16 +113,16 @@ export default function NewsPage() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 block">{t('news.region')}</label>
+              <label className="text-[18px] font-semibold text-[var(--foreground)] mb-4 block">{t('news.region')}</label>
               <div className="flex flex-wrap gap-2">
                 {['all', 'Global', 'US', 'EU', 'Asia'].map((region) => (
                   <button
                     key={region}
                     onClick={() => setSelectedRegion(region === 'all' ? 'all' : region)}
-                    className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all ${
+                    className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all rounded-md ${
                       selectedRegion === region
-                        ? 'bg-[#3d3d3d] text-white'
-                        : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                        ? 'bg-[var(--foreground)] text-[var(--background)] font-semibold'
+                        : 'border border-[var(--color-border)] text-neutral-400 hover:border-[var(--color-hover-border)]'
                     }`}
                   >
                     {region === 'all' ? t('news.all') : region}
@@ -136,17 +138,17 @@ export default function NewsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Array(6).fill(0).map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-48 bg-gray-100 mb-4"></div>
-                <div className="h-4 bg-gray-100 mb-2 w-1/3"></div>
-                <div className="h-6 bg-gray-100 mb-2"></div>
-                <div className="h-4 bg-gray-100"></div>
+                <div className="h-48 bg-neutral-50 mb-4"></div>
+                <div className="h-4 bg-neutral-50 mb-2 w-1/3"></div>
+                <div className="h-6 bg-neutral-50 mb-2"></div>
+                <div className="h-4 bg-neutral-50"></div>
               </div>
             ))}
           </div>
         ) : articles.length === 0 ? (
           <div className="text-center py-20">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('news.no_articles')}</h3>
-            <p className="text-gray-500 font-light">{t('news.adjust_filters')}</p>
+            <h3 className="text-2xl font-bold text-[var(--foreground)] mb-2">{t('news.no_articles')}</h3>
+            <p className="text-neutral-400 font-light">{t('news.adjust_filters')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -154,9 +156,9 @@ export default function NewsPage() {
               <Link
                 key={article.id}
                 href={`/news/${article.slug}`}
-                className="bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                className="bg-surface border border-[var(--color-border)] hover:border-[var(--color-hover-border)] transition-all duration-300 overflow-hidden group rounded-[12px]"
               >
-                <div className="h-48 bg-gray-100 overflow-hidden">
+                <div className="h-48 bg-neutral-50 overflow-hidden">
                   <img
                     src={article.image}
                     alt={article.title[lang]}
@@ -165,25 +167,25 @@ export default function NewsPage() {
                 </div>
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2.5 py-1 bg-[#3d3d3d] text-white text-[10px] font-medium uppercase tracking-wider">
+                    <span className="px-2.5 py-1 bg-[var(--foreground)] text-[var(--background)] text-[10px] font-medium uppercase tracking-wider rounded-md">
                       {article.category}
                     </span>
-                    <span className="px-2.5 py-1 bg-gray-100 text-gray-500 text-[10px] font-medium uppercase tracking-wider">
+                    <span className="px-2.5 py-1 bg-neutral-50 text-neutral-400 text-[10px] font-medium uppercase tracking-wider rounded-md">
                       {article.region}
                     </span>
-                    <span className="text-xs text-gray-400 ml-auto">
+                    <span className="text-xs text-neutral-400 ml-auto">
                       {formatDate(article.publishedAt)}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold mb-3 group-hover:text-gray-600 transition-colors line-clamp-2">
+                  <h3 className="text-lg font-semibold mb-3 text-[var(--foreground)] group-hover:text-[var(--color-theme-600)] transition-colors line-clamp-2">
                     {article.title[lang]}
                   </h3>
-                  <p className="text-gray-500 text-sm font-light mb-4 line-clamp-2">
+                  <p className="text-[var(--foreground)]/85 text-[15px] mb-4 line-clamp-2 leading-relaxed">
                     {article.summary[lang]}
                   </p>
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                    <span className="text-xs text-gray-400">{article.author}</span>
-                    <span className="text-gray-400 group-hover:text-gray-600 transition-colors">→</span>
+                  <div className="flex justify-between items-center pt-4 border-t border-[var(--color-border)]">
+                    <span className="text-xs text-neutral-400">{article.author}</span>
+                    <span className="text-neutral-400 group-hover:text-neutral-400 transition-colors">→</span>
                   </div>
                 </div>
               </Link>

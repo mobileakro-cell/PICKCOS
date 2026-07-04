@@ -8,6 +8,32 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'nav.suppliers': 'Suppliers',
     'nav.about': 'About',
     'nav.contact': 'Contact',
+    'nav.register': 'Register',
+
+    // Register (member lead capture)
+    'register.eyebrow': 'Members Only',
+    'register.title': 'Get new verified suppliers\nbefore anyone else',
+    'register.subtitle': 'Register your organization to unlock our members-only B2B supplier briefings — new verified Korean manufacturers, factory capabilities, and exhibition showcases, delivered straight to your inbox.',
+    'register.benefit_1_title': 'Exclusive supplier drops',
+    'register.benefit_1_desc': 'New verified manufacturers shared with registered members first — before they go public.',
+    'register.benefit_2_title': 'Factory & capability profiles',
+    'register.benefit_2_desc': 'MOQ, lead times, certifications and production capacity for each newly onboarded supplier.',
+    'register.benefit_3_title': 'Exhibition previews',
+    'register.benefit_3_desc': 'Curated K-beauty expo lineups and booth showcases ahead of the show.',
+    'register.form_title': 'Create your member profile',
+    'register.company': 'Company / organization',
+    'register.name': 'Your name',
+    'register.email': 'Work email',
+    'register.role': 'Role',
+    'register.country': 'Country / region',
+    'register.interest': 'Sourcing interest',
+    'register.interest_placeholder': 'e.g. OEM skincare, packaging, ingredients',
+    'register.submit': 'Register for access',
+    'register.consent': 'I agree to receive members-only supplier briefings from PICKCOS.',
+    'register.success_title': 'You’re on the list',
+    'register.success_desc': 'Welcome aboard. New verified supplier briefings will be sent to your inbox — members get them first.',
+    'register.success_back': 'Back to home',
+    'register.required': 'Please fill in the required fields.',
 
     // Homepage
     'home.headlines': 'Headlines',
@@ -25,6 +51,14 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'home.enter_email': 'Enter your email',
     'home.subscribe': 'Subscribe',
     'home.thanks_subscribing': 'Thanks for subscribing!',
+    'home.hero_eyebrow': 'K-Beauty B2B Sourcing Platform',
+    'home.hero_title': 'Where global brands meet\nverified Korean suppliers',
+    'home.hero_subtitle': 'OEM · ODM · packaging · ingredients — discover, compare, and connect with Korea’s most trusted beauty manufacturers.',
+    'home.hero_browse': 'Browse Suppliers',
+    'home.hero_matching': 'Request Matching',
+    'home.hero_stat_suppliers': 'Verified suppliers',
+    'home.hero_stat_categories': 'Sourcing categories',
+    'home.hero_stat_markets': 'Export markets',
 
     // News
     'news.title': 'NEWS',
@@ -58,7 +92,7 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'sourcing.suppliers': 'suppliers',
 
     // Exhibitions
-    'exhibitions.title': 'EXHIBITIONS',
+    'exhibitions.title': 'GLOBAL EXHIBITIONS',
     'exhibitions.subtitle': 'Connect with Korean beauty suppliers at trade shows and events',
     'exhibitions.upcoming': 'Upcoming',
     'exhibitions.past': 'Past',
@@ -255,11 +289,37 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
 
   ko: {
     // Header
-    'nav.news': '뉴스',
-    'nav.exhibitions': '전시회',
-    'nav.suppliers': '공급업체',
-    'nav.about': '소개',
-    'nav.contact': '문의',
+    'nav.news': 'News',
+    'nav.exhibitions': 'Exhibitions',
+    'nav.suppliers': 'Suppliers',
+    'nav.about': 'About',
+    'nav.contact': 'Contact',
+    'nav.register': 'Register',
+
+    // Register (member lead capture)
+    'register.eyebrow': '회원 전용',
+    'register.title': '신규 검증 공급사를\n가장 먼저 받아보세요',
+    'register.subtitle': '소속을 등록하면 회원 전용 B2B 공급사 브리핑을 받아보실 수 있습니다 — 새롭게 검증된 한국 제조사, 생산 역량, 전시 쇼케이스 정보를 이메일로 가장 먼저 전해드립니다.',
+    'register.benefit_1_title': '독점 신규 공급사 공개',
+    'register.benefit_1_desc': '새로 검증된 제조사를 일반 공개 전에 등록 회원에게 먼저 제공합니다.',
+    'register.benefit_2_title': '생산공장·역량 프로필',
+    'register.benefit_2_desc': '신규 온보딩 공급사별 MOQ·리드타임·인증·생산 캐파 정보를 제공합니다.',
+    'register.benefit_3_title': '전시 프리뷰',
+    'register.benefit_3_desc': '개막 전, 엄선한 K-뷰티 박람회 라인업과 부스 쇼케이스를 미리 안내합니다.',
+    'register.form_title': '회원 프로필 만들기',
+    'register.company': '회사 / 소속',
+    'register.name': '담당자명',
+    'register.email': '업무 이메일',
+    'register.role': '직책',
+    'register.country': '국가 / 지역',
+    'register.interest': '관심 소싱 분야',
+    'register.interest_placeholder': '예: OEM 스킨케어, 패키징, 원료',
+    'register.submit': '등록하고 정보 받기',
+    'register.consent': 'PICKCOS의 회원 전용 공급사 브리핑 수신에 동의합니다.',
+    'register.success_title': '등록이 완료되었습니다',
+    'register.success_desc': '환영합니다. 신규 검증 공급사 브리핑을 이메일로 보내드립니다 — 회원에게 가장 먼저 전해집니다.',
+    'register.success_back': '홈으로 돌아가기',
+    'register.required': '필수 항목을 입력해 주세요.',
 
     // Homepage
     'home.headlines': '주요 뉴스',
@@ -277,9 +337,17 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'home.enter_email': '이메일을 입력하세요',
     'home.subscribe': '구독하기',
     'home.thanks_subscribing': '구독해 주셔서 감사합니다!',
+    'home.hero_eyebrow': 'K-뷰티 B2B 소싱 플랫폼',
+    'home.hero_title': '글로벌 브랜드와\n검증된 한국 공급사를 잇다',
+    'home.hero_subtitle': 'OEM·ODM·패키징·원료까지, 신뢰할 수 있는 K-뷰티 제조사를 검색하고 매칭받으세요.',
+    'home.hero_browse': '공급사 검색하기',
+    'home.hero_matching': '매칭 문의하기',
+    'home.hero_stat_suppliers': '검증 공급사',
+    'home.hero_stat_categories': '소싱 카테고리',
+    'home.hero_stat_markets': '수출 시장',
 
     // News
-    'news.title': '뉴스',
+    'news.title': 'NEWS',
     'news.subtitle': 'K-뷰티 소싱 트렌드, 규제 및 업계 인사이트를 확인하세요',
     'news.category': '카테고리',
     'news.region': '지역',
@@ -288,7 +356,7 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'news.adjust_filters': '필터를 조정해 보세요.',
 
     // Sourcing
-    'sourcing.title': '공급업체',
+    'sourcing.title': 'SUPPLIERS',
     'sourcing.subtitle': '최적의 K-뷰티 공급업체 파트너를 찾아보세요',
     'sourcing.search': '검색',
     'sourcing.search_placeholder': '공급업체명...',
@@ -310,7 +378,7 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'sourcing.suppliers': '개 공급업체',
 
     // Exhibitions
-    'exhibitions.title': '전시회',
+    'exhibitions.title': 'GLOBAL EXHIBITIONS',
     'exhibitions.subtitle': '무역 박람회에서 한국 뷰티 공급업체를 만나보세요',
     'exhibitions.upcoming': '예정',
     'exhibitions.past': '종료',
@@ -320,7 +388,7 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'exhibitions.no_exhibitions': '전시회를 찾을 수 없습니다',
 
     // About
-    'about.title': 'PICKCOS 소개',
+    'about.title': 'ABOUT PICKCOS',
     'about.subtitle': '글로벌 바이어와 검증된 공급업체를 연결하고, 모든 과정에서 전문 가이드를 제공하여 K-뷰티 소싱의 신뢰를 구축합니다.',
     'about.our_mission': '우리의 미션',
     'about.mission_title': 'K-뷰티 소싱의 간소화',
@@ -365,7 +433,7 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'about.ready_start': '소싱 여정을 시작할 준비가 되셨나요?',
 
     // Contact
-    'contact.title': '문의하기',
+    'contact.title': 'CONTACT US',
     'contact.subtitle': '궁금한 점이 있으신가요? 도움을 드리겠습니다.',
     'contact.your_info': '기본 정보',
     'contact.company_name': '회사명',
@@ -450,7 +518,7 @@ export const uiStrings: Record<Lang, Record<string, string>> = {
     'exhibition.browse_suppliers': '공급업체 둘러보기',
 
     // Request Matching
-    'matching.title': '맞춤 공급업체 매칭',
+    'matching.title': 'Custom Supplier Matching',
     'matching.subtitle': '찾고 계신 것을 알려주시면, 최적의 한국 공급업체를 매칭해 드리겠습니다.',
     'matching.preferred_supplier': '선호 공급업체',
     'matching.step1_title': '무엇을 찾고 계신가요?',

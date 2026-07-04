@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mockArticles, addArticle, updateArticle, deleteArticle } from '@/lib/mock'
+import { listAll, insertOne, patchOne, removeOne } from '@/lib/db'
+import type { Article } from '@/lib/types'
+import { getAdmin } from '@/lib/auth'
+
+const unauthorized = () => NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  
-  let items = [...mockArticles]
+
+  let items = await listAll<Article>('article')
   
   const category = searchParams.get('category')
   if (category && category !== 'all') {
@@ -52,25 +56,28 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!getAdmin(request)) return unauthorized()
   const body = await request.json()
-  const article = addArticle(body)
+  const article = await insertOne('article', body)
   return NextResponse.json(article, { status: 201 })
 }
 
 export async function PUT(request: NextRequest) {
+  if (!getAdmin(request)) return unauthorized()
   const body = await request.json()
   const { id, ...data } = body
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const updated = updateArticle(id, data)
+  const updated = await patchOne<Article>('article', id, data)
   if (!updated) return NextResponse.json({ error: 'Article not found' }, { status: 404 })
   return NextResponse.json(updated)
 }
 
 export async function DELETE(request: NextRequest) {
+  if (!getAdmin(request)) return unauthorized()
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const deleted = deleteArticle(id)
+  const deleted = await removeOne('article', id)
   if (!deleted) return NextResponse.json({ error: 'Article not found' }, { status: 404 })
   return NextResponse.json({ success: true })
 }

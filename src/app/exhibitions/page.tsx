@@ -82,27 +82,29 @@ export default function ExhibitionsPage() {
   const totalPages = Math.ceil(total / pageSize)
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
+    <div className="min-h-screen bg-[var(--background)]">
       {/* Hero */}
-      <section className="bg-white py-20 border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 tracking-tight">{t('exhibitions.title')}</h1>
-          <p className="text-base text-gray-500 font-light">
+      <section className="pt-20 pb-12" style={{ background: 'var(--background)' }}>
+        <div className="max-w-[1248px] mx-auto px-6 md:px-24 text-center">
+          <div className="page-title-reveal">
+            <h1 className="text-[38px] font-bold tracking-[-0.02em] mb-3 text-[var(--foreground)]">{t('exhibitions.title')}</h1>
+          </div>
+          <p className="page-title-subtitle text-base text-neutral-400 font-light">
             {t('exhibitions.subtitle')}
           </p>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-16">
+      <div className="max-w-[1248px] mx-auto px-6 md:px-24 py-16">
         {/* Status Tabs */}
-        <div className="mb-8 border-b border-gray-200">
+        <div className="mb-8 border-b border-[var(--color-border)]">
           <div className="flex gap-8">
             <button
               onClick={() => updateFilter('status', 'upcoming')}
               className={`pb-4 px-1 border-b-2 text-sm font-medium transition-colors ${
                 status === 'upcoming'
-                  ? 'border-[#3d3d3d] text-gray-900'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
+                  ? 'border-[var(--foreground)] text-[var(--foreground)]'
+                  : 'border-transparent text-neutral-400 hover:text-neutral-400'
               }`}
             >
               {t('exhibitions.upcoming')}
@@ -111,8 +113,8 @@ export default function ExhibitionsPage() {
               onClick={() => updateFilter('status', 'past')}
               className={`pb-4 px-1 border-b-2 text-sm font-medium transition-colors ${
                 status === 'past'
-                  ? 'border-[#3d3d3d] text-gray-900'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
+                  ? 'border-[var(--foreground)] text-[var(--foreground)]'
+                  : 'border-transparent text-neutral-400 hover:text-neutral-400'
               }`}
             >
               {t('exhibitions.past_events')}
@@ -122,16 +124,16 @@ export default function ExhibitionsPage() {
 
         {/* Region Filter */}
         <div className="mb-12">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4 block">Filter by Region</label>
+          <label className="text-[18px] font-semibold text-[var(--foreground)] mb-4 block">{t('exhibitions.filter_region')}</label>
           <div className="flex flex-wrap gap-2">
             {REGIONS.map(reg => (
               <button
                 key={reg.id}
                 onClick={() => updateFilter('region', reg.id)}
-                className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all ${
+                className={`px-4 py-2 text-xs font-medium uppercase tracking-wider transition-all rounded-md ${
                   region === reg.id
-                    ? 'bg-[#3d3d3d] text-white'
-                    : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                    ? 'bg-[var(--foreground)] text-[var(--background)] font-semibold'
+                    : 'border border-[var(--color-border)] text-neutral-400 hover:border-[var(--color-hover-border)]'
                 }`}
               >
                 {reg.labelKey ? t(reg.labelKey) : reg.label}
@@ -145,9 +147,9 @@ export default function ExhibitionsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Array(6).fill(0).map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-48 bg-gray-100 mb-4"></div>
-                <div className="h-6 bg-gray-100 mb-2"></div>
-                <div className="h-4 bg-gray-100"></div>
+                <div className="h-48 bg-neutral-50 mb-4"></div>
+                <div className="h-6 bg-neutral-50 mb-2"></div>
+                <div className="h-4 bg-neutral-50"></div>
               </div>
             ))}
           </div>
@@ -158,9 +160,9 @@ export default function ExhibitionsPage() {
                 <Link
                   key={exhibition.id}
                   href={`/exhibitions/${exhibition.id}`}
-                  className="bg-white border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group"
+                  className="bg-surface border border-[var(--color-border)] overflow-hidden hover:border-[var(--color-hover-border)] transition-all duration-300 group rounded-[12px]"
                 >
-                  <div className="relative h-48 bg-gray-100 overflow-hidden">
+                  <div className="relative h-48 bg-neutral-50 overflow-hidden">
                     <img
                       src={exhibition.image}
                       alt={exhibition.title[lang]}
@@ -169,27 +171,27 @@ export default function ExhibitionsPage() {
                   </div>
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-3">
-                      <span className={`px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider ${
+                      <span className={`px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-md ${
                         exhibition.status === 'upcoming'
-                          ? 'bg-[#3d3d3d] text-white'
-                          : 'bg-gray-100 text-gray-500'
+                          ? 'bg-[var(--foreground)] text-[var(--background)]'
+                          : 'bg-neutral-50 text-neutral-400'
                       }`}>
                         {exhibition.status === 'upcoming' ? t('exhibitions.upcoming') : t('exhibitions.past_events')}
                       </span>
-                      <span className="px-2.5 py-1 bg-gray-100 text-gray-500 text-[10px] font-medium uppercase tracking-wider">
+                      <span className="px-2.5 py-1 bg-neutral-50 text-neutral-400 text-[10px] font-medium uppercase tracking-wider rounded-md">
                         {exhibition.region}
                       </span>
                     </div>
-                    <h3 className="font-bold text-lg mb-3 group-hover:text-gray-600 transition-colors line-clamp-2">
+                    <h3 className="font-bold text-lg mb-3 text-[var(--foreground)] group-hover:text-[var(--color-theme-600)] transition-colors line-clamp-2">
                       {exhibition.title[lang]}
                     </h3>
-                    <div className="text-sm text-gray-500 mb-2 font-light">
+                    <div className="text-sm text-neutral-400 mb-2 font-light">
                       {exhibition.dateRange}
                     </div>
-                    <div className="text-sm text-gray-500 mb-4 font-light">
+                    <div className="text-sm text-neutral-400 mb-4 font-light">
                       {exhibition.location[lang]}
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2 font-light">
+                    <p className="text-sm text-neutral-400 line-clamp-2 font-light">
                       {exhibition.description[lang]}
                     </p>
                   </div>
@@ -203,7 +205,7 @@ export default function ExhibitionsPage() {
                 <button
                   disabled={page === 1}
                   onClick={() => goToPage(page - 1)}
-                  className="px-4 py-2 border border-gray-200 text-sm font-medium disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-[var(--color-border)] text-sm font-medium disabled:opacity-50 hover:border-[var(--color-hover-border)] transition-colors rounded-md"
                 >
                   ← Prev
                 </button>
@@ -211,10 +213,10 @@ export default function ExhibitionsPage() {
                   <button
                     key={p}
                     onClick={() => goToPage(p)}
-                    className={`px-4 py-2 border text-sm font-medium transition-all ${
+                    className={`px-4 py-2 border text-sm font-medium transition-all rounded-md ${
                       page === p
-                        ? 'bg-[#3d3d3d] text-white border-[#3d3d3d]'
-                        : 'border-gray-200 hover:bg-gray-50'
+                        ? 'bg-[var(--foreground)] text-[var(--background)] border-[var(--foreground)]'
+                        : 'border-[var(--color-border)] hover:border-[var(--color-hover-border)]'
                     }`}
                   >
                     {p}
@@ -223,7 +225,7 @@ export default function ExhibitionsPage() {
                 <button
                   disabled={page === totalPages}
                   onClick={() => goToPage(page + 1)}
-                  className="px-4 py-2 border border-gray-200 text-sm font-medium disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-[var(--color-border)] text-sm font-medium disabled:opacity-50 hover:border-[var(--color-hover-border)] transition-colors rounded-md"
                 >
                   Next →
                 </button>
@@ -232,11 +234,11 @@ export default function ExhibitionsPage() {
           </>
         ) : (
           <div className="text-center py-20">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('exhibitions.no_exhibitions')}</h3>
-            <p className="text-gray-500 font-light mb-6">Try adjusting your filters</p>
+            <h3 className="text-2xl font-bold text-[var(--foreground)] mb-2">{t('exhibitions.no_exhibitions')}</h3>
+            <p className="text-neutral-400 font-light mb-6">Try adjusting your filters</p>
             <button
               onClick={() => router.push('/exhibitions?status=upcoming')}
-              className="px-6 py-3 bg-[#3d3d3d] text-white font-medium hover:bg-[#2d2d2d] transition-colors text-sm uppercase tracking-wider"
+              className="px-6 py-3 bg-[var(--foreground)] text-[var(--background)] font-medium hover:bg-neutral-700 transition-colors text-sm uppercase tracking-wider"
             >
               View all upcoming exhibitions
             </button>

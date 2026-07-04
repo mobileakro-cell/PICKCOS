@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mockExhibitions } from '@/lib/mock'
+import { getOne } from '@/lib/db'
+import type { Exhibition } from '@/lib/types'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const exhibition = mockExhibitions.find(e => e.id === params.id)
+  const exhibition = await getOne<Exhibition>('exhibition', params.id)
   if (!exhibition) {
     return NextResponse.json({ error: 'Exhibition not found' }, { status: 404 })
   }

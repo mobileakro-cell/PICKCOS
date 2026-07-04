@@ -18,12 +18,39 @@ export function blArr(en: string[], ko: string[]): BLArray {
   return { en, ko }
 }
 
+// ── Supplier taxonomy (2-axis faceted) ──
+// Axis 1 — supplier type (역할)
+export type SupplierType = 'Packaging' | 'Ingredients' | 'Materials'
+// Axis 2 — product category (제품군)
+export type ProductCategory = 'Skincare' | 'Functional' | 'Makeup' | 'Hair' | 'Body' | 'Fragrance'
+
+export const SUPPLIER_TYPES: { code: SupplierType; en: string; ko: string }[] = [
+  { code: 'Packaging', en: 'Packaging', ko: '패키징' },
+  { code: 'Ingredients', en: 'Ingredients', ko: '원료' },
+  { code: 'Materials', en: 'Materials', ko: '부자재' },
+]
+
+export const PRODUCT_CATEGORIES: { code: ProductCategory; en: string; ko: string }[] = [
+  { code: 'Skincare', en: 'Skincare', ko: '스킨케어' },
+  { code: 'Functional', en: 'Functional care', ko: '기능성케어' },
+  { code: 'Makeup', en: 'Makeup', ko: '메이크업' },
+  { code: 'Hair', en: 'Hair', ko: '헤어' },
+  { code: 'Body', en: 'Body', ko: '바디' },
+  { code: 'Fragrance', en: 'Fragrance', ko: '향' },
+]
+
+export const supplierTypeLabel = (code: string, lang: 'en' | 'ko') =>
+  SUPPLIER_TYPES.find((t) => t.code === code)?.[lang] ?? code
+export const productCategoryLabel = (code: string, lang: 'en' | 'ko') =>
+  PRODUCT_CATEGORIES.find((p) => p.code === code)?.[lang] ?? code
+
 // Supplier Types
 export interface Supplier {
   id: string
   name: string
   supplierType: BL
-  category: 'OEM' | 'Packaging' | 'Ingredients' | 'Contract Manufacturing' | 'Equipment'
+  category: SupplierType
+  productCategories: ProductCategory[]
   image: string
   location: BL
   country: string

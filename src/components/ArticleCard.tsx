@@ -21,35 +21,38 @@ export default function ArticleCard({
   author,
   publishedAt,
 }: ArticleCardProps) {
-  const formattedDate = new Date(publishedAt).toLocaleDateString('en-US', { 
-    year: 'numeric', month: '2-digit', day: '2-digit' 
-  }).replace(/\//g, ' - ')
+  const formattedDate = new Date(publishedAt).toLocaleDateString('en-US', {
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  }).replace(/\//g, '.')
 
   return (
     <Link
       href={`/news/${slug}`}
-      className="bg-white rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 border border-gray-100"
+      className="border-2 border-x-transparent border-y-[var(--color-border)] bg-surface group hover:border-y-[var(--color-hover-border)] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300"
     >
-      <div className="h-48 bg-gray-50 overflow-hidden relative">
+      <div className="h-48 bg-neutral-50 overflow-hidden relative">
         <img
           src={image}
           alt={title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
+        <span className="absolute top-3 left-3 px-2.5 py-1 bg-theme-400 text-white text-[11px] font-semibold uppercase tracking-wider">
+          {category}
+        </span>
       </div>
-      <div className="p-6">
-        <p className="text-sm text-gray-400 font-medium mb-3 tracking-wide">
+      <div className="p-5">
+        <p className="text-[13px] text-[var(--color-sub-text)] font-medium mb-3">
           {formattedDate}
         </p>
-        <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-rose-500 transition-colors line-clamp-2 leading-tight">
+        <h3 className="text-[18px] font-semibold mb-3 text-[var(--foreground)] group-hover:text-theme-600 transition-colors line-clamp-2 leading-[1.35]">
           {title}
         </h3>
-        <p className="text-gray-500 text-sm mb-4 line-clamp-3 font-light leading-relaxed">
+        <p className="text-[15px] text-neutral-400 mb-4 line-clamp-3 leading-[1.5] font-normal">
           {summary}
         </p>
-        <div className="flex gap-2">
-          <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-            {category}
+        <div className="flex items-center gap-2">
+          <span className="rounded-full border border-[var(--color-border)] bg-surface px-2 py-0.5 text-[13px] text-neutral-400 font-medium">
+            {region}
           </span>
         </div>
       </div>

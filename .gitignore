@@ -26,6 +26,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# local runtime data (legacy file store) + tool config
+/data
+.claude
+
 # vercel
 .vercel
 

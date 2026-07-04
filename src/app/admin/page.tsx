@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import type { Supplier, Article, Exhibition, BL, BLArray } from '@/lib/types'
-import { bl, blArr } from '@/lib/types'
+import { bl, blArr, SUPPLIER_TYPES, PRODUCT_CATEGORIES } from '@/lib/types'
 
 // --------------- Auth types ---------------
 type AdminRole = 'super' | 'admin'
@@ -122,7 +122,7 @@ function BilingualArrayInput({ label, value, onChange }: {
 
 // --------------- Default form values ---------------
 const emptySupplier: Omit<Supplier, 'id'> = {
-  name: '', supplierType: { ...emptyBL }, category: 'OEM', image: '', location: { ...emptyBL }, country: 'South Korea',
+  name: '', supplierType: { ...emptyBL }, category: 'Packaging', productCategories: [], image: '', location: { ...emptyBL }, country: 'South Korea',
   featured: false, verified: true, ambassadorPick: false, certifications: [], moq: 1000, leadTime: 45,
   moqRange: '', leadTimeRange: '', description: { ...emptyBL }, descriptionFull: { ...emptyBL }, coreStrengths: { ...emptyBLArr },
   capabilities: { ...emptyBLArr }, regulatoryNotes: { ...emptyBL }, exportMarkets: [], files: [], website: '', contact: '',
@@ -828,14 +828,32 @@ export default function AdminPage() {
                 <input type="text" value={editingSupplier.name} onChange={e => setEditingSupplier({ ...editingSupplier, name: e.target.value })} className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-primary" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                <select value={editingSupplier.category} onChange={e => setEditingSupplier({ ...editingSupplier, category: e.target.value })} className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-primary">
-                  <option value="OEM">OEM</option>
-                  <option value="Packaging">Packaging</option>
-                  <option value="Ingredients">Ingredients</option>
-                  <option value="Contract Manufacturing">Contract Manufacturing</option>
-                  <option value="Equipment">Equipment</option>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Supplier type · 공급자 유형 *</label>
+                <select value={editingSupplier.category} onChange={e => setEditingSupplier({ ...editingSupplier, category: e.target.value as Supplier['category'] })} className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-primary">
+                  {SUPPLIER_TYPES.map(s => <option key={s.code} value={s.code}>{s.en} · {s.ko}</option>)}
                 </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Product categories · 제품군</label>
+                <div className="flex flex-wrap gap-2">
+                  {PRODUCT_CATEGORIES.map(p => {
+                    const on = (editingSupplier.productCategories || []).includes(p.code)
+                    return (
+                      <button
+                        type="button"
+                        key={p.code}
+                        onClick={() => {
+                          const cur = editingSupplier.productCategories || []
+                          const next = on ? cur.filter((x: string) => x !== p.code) : [...cur, p.code]
+                          setEditingSupplier({ ...editingSupplier, productCategories: next })
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${on ? 'bg-[var(--color-theme-500)] text-white border-[var(--color-theme-500)]' : 'border-gray-300 text-gray-600 hover:border-gray-400'}`}
+                      >
+                        {p.en} · {p.ko}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
               <BilingualInput label="Supplier Type" value={editingSupplier.supplierType || emptyBL} onChange={v => setEditingSupplier({ ...editingSupplier, supplierType: v })} />
               <BilingualInput label="Location" value={editingSupplier.location || emptyBL} onChange={v => setEditingSupplier({ ...editingSupplier, location: v })} />

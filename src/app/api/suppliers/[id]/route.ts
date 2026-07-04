@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mockSuppliers } from '@/lib/mock'
+import { getSupplier } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const supplier = mockSuppliers.find(s => s.id === params.id)
+  const supplier = await getSupplier(params.id)
 
   if (!supplier) {
     return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })

@@ -34,41 +34,48 @@ export default function SupplierCard({
   return (
     <Link
       href={`/suppliers/${id}`}
-      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 group h-full flex flex-col border border-gray-100"
+      className="border-2 border-x-transparent border-y-[var(--color-border)] bg-surface flex flex-col group hover:border-y-[var(--color-hover-border)] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300"
     >
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <img
           src={image}
           alt={name}
-          className="w-full h-52 object-cover bg-gray-50 group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-52 object-cover bg-neutral-50 group-hover:scale-105 transition-transform duration-500"
         />
-        {verified && (
-          <span className="absolute top-4 right-4 px-3 py-1 bg-white text-gray-900 text-xs font-medium rounded-full shadow-sm">
-            Verified
-          </span>
-        )}
+        <div className="absolute top-3 right-3 flex gap-1.5">
+          {verified && (
+            <span className="px-2.5 py-1 bg-theme-400 text-white text-[11px] font-semibold uppercase tracking-wider">
+              Verified
+            </span>
+          )}
+          {ambassadorPick && (
+            <span className="px-2.5 py-1 bg-[var(--foreground)] text-[var(--background)] text-[11px] font-semibold uppercase tracking-wider">
+              Pick
+            </span>
+          )}
+        </div>
       </div>
-      <div className="p-6 flex flex-col flex-1">
-        <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-gray-600 transition-colors">
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="font-semibold text-[22px] text-center leading-[1.3] mb-2 text-[var(--foreground)] group-hover:text-[var(--color-theme-600)] transition-colors">
           {name}
         </h3>
-        <p className="text-sm text-gray-500 mb-3">{supplierType}</p>
-        <p className="text-sm text-gray-400 mb-4">
+        <p className="text-[15px] text-neutral-400 mb-3 font-normal text-center">{supplierType}</p>
+        <p className="text-[13px] text-[var(--color-sub-text)] mb-3 text-center">
           {location}, {country}
         </p>
         {!compact && (
-          <p className="text-sm text-gray-500 mb-4 line-clamp-2 flex-1 leading-relaxed">
+          <p className="text-[15px] text-neutral-400 mb-4 line-clamp-2 flex-1 leading-[1.5] font-normal">
             {description}
           </p>
         )}
-        <div className="text-xs text-gray-400 space-y-1 mb-4">
+        <div className="text-[13px] text-[var(--color-sub-text)] space-y-1 mb-4">
           <div>MOQ: {moqRange}</div>
           <div>Lead Time: {leadTimeRange}</div>
         </div>
         {capabilities && capabilities.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {capabilities.slice(0, compact ? 2 : 3).map((cap, i) => (
-              <span key={i} className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <span key={i} className="rounded-full border border-[var(--color-border)] bg-surface px-2 py-0.5 text-[13px] text-neutral-400 font-medium group-hover:border-theme-500/40 group-hover:text-[var(--foreground)] transition-colors">
                 {cap}
               </span>
             ))}
