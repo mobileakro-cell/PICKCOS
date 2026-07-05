@@ -79,6 +79,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!privacyConsent) {
+      return NextResponse.json(
+        { error: 'Privacy consent is required' },
+        { status: 400 }
+      )
+    }
+
     // Generate request ID
     const timestamp = Date.now()
     const random = Math.random().toString(36).substr(2, 5).toUpperCase()
