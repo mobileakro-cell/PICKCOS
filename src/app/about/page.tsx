@@ -255,6 +255,35 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* 협업 · 제휴 · 문의 (Contact을 별도 메뉴 대신 About에 통합) */}
+      <section id="contact" className="py-20 scroll-mt-24" style={{ background: 'var(--background)' }}>
+        <div className="max-w-[720px] mx-auto px-6 text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--color-gray-text)] mb-4">
+            {lang === 'ko' ? '협업 · 제휴 · 문의' : 'Partnership & Inquiries'}
+          </p>
+          <h2 className="text-3xl font-light mb-6 text-[var(--foreground)]">
+            {lang === 'ko' ? '함께 하고 싶으신가요?' : "Let's work together"}
+          </h2>
+          <p className="text-neutral-400 font-light leading-relaxed mb-8">
+            {lang === 'ko'
+              ? '파트너십·제휴·미디어·일반 문의를 환영합니다. (제품 소싱 요청은 매칭 신청을 이용해 주세요.)'
+              : 'We welcome partnership, collaboration, media, and general inquiries. (For product sourcing, please use Request Matching.)'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              href="/contact"
+              className="px-8 py-3 text-xs font-medium uppercase tracking-wider rounded-md hover:opacity-90 transition-opacity"
+              style={{ background: 'var(--foreground)', color: 'var(--background)' }}
+            >
+              {lang === 'ko' ? '문의하기' : 'Get in Touch'}
+            </Link>
+            <a href="mailto:hello@pickcos.com" className="text-[14px] text-neutral-400 hover:text-[var(--foreground)] transition-colors">
+              hello@pickcos.com
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{ background: 'var(--foreground)' }}>
         <div className="max-w-[1248px] mx-auto px-6 md:px-24 py-12">
