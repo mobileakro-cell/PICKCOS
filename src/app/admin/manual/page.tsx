@@ -1,0 +1,185 @@
+'use client'
+
+import Link from 'next/link'
+
+const steps = [
+  {
+    n: '01',
+    title: '로그인하기',
+    body: [
+      '주소창에 /admin 을 입력해 관리자 페이지로 들어갑니다.',
+      '아이디와 비밀번호를 입력하고 초록색 [로그인] 버튼을 누릅니다.',
+      '로그인 정보는 담당자에게 문의하세요. (분실 시 재설정 가능)',
+    ],
+  },
+  {
+    n: '02',
+    title: '대시보드 한눈에 보기',
+    body: [
+      '상단 카드에서 총 문의·매칭 요청·공급사 수·발행 기사 수를 바로 확인합니다.',
+      '그 아래 탭(문의 / 매칭 / 공급사 / 기사 / 전시 / 설정)으로 항목을 이동합니다.',
+      '오른쪽 위 [로그아웃]으로 나가고, [사이트로 돌아가기]로 실제 사이트를 봅니다.',
+    ],
+  },
+  {
+    n: '03',
+    title: '공급사 등록·수정·삭제',
+    body: [
+      '[공급사] 탭 → 오른쪽 [+ 공급사 추가] 버튼을 누릅니다.',
+      '업체명을 적고, 공급자 유형(패키징/원료/부자재)과 제품군(복수 선택)을 고릅니다.',
+      'MOQ·리드타임·범위·국가는 드롭다운에서 값을 선택합니다. (직접 입력 아님)',
+      '인증·수출 시장은 원하는 항목의 칩을 눌러 여러 개 선택합니다.',
+      '설명은 EN(영문)·KO(국문) 두 칸에 나눠 적습니다.',
+      '맨 아래 [등록](신규) 또는 [저장](수정)을 누르면 저장됩니다.',
+      '수정은 목록의 [수정], 삭제는 [삭제] 버튼(삭제 시 확인창이 뜹니다).',
+    ],
+  },
+  {
+    n: '04',
+    title: '이미지 넣기',
+    body: [
+      '이미지는 필수가 아닙니다. 없으면 비워도 저장됩니다.',
+      '이미 웹에 있는 이미지면 [이미지 URL] 칸에 주소(https://...)를 붙여넣습니다.',
+      '붙여넣으면 아래에 미리보기가 바로 나타납니다.',
+      '(예정) 파일을 직접 여러 장 올리는 일괄 업로드 기능이 추가됩니다.',
+    ],
+  },
+  {
+    n: '05',
+    title: '기사(뉴스) 등록',
+    body: [
+      '[기사] 탭 → [+ 기사 추가].',
+      '제목(EN/KO), 카테고리, 지역, 발행일, 요약, 본문을 입력합니다.',
+      '슬러그(주소)는 비워두면 제목으로 자동 생성됩니다.',
+      '[헤드라인으로 설정]을 켜면 홈 상단 대표 기사로 노출됩니다.',
+    ],
+  },
+  {
+    n: '06',
+    title: '전시 등록',
+    body: [
+      '[전시] 탭 → [+ 전시 추가].',
+      '전시명·기간·장소·지역·상태(예정/종료/준비중)를 입력합니다.',
+      '참가 공급사 번호, 관련 기사 번호를 세로줄(|)로 구분해 연결할 수 있습니다.',
+      '여러 전시는 [전시] 탭의 CSV 일괄 도구로 한 번에 올릴 수 있습니다. (아래 09번 참고)',
+    ],
+  },
+  {
+    n: '07',
+    title: '샘플(데모) 데이터 정리',
+    body: [
+      '처음 들어있는 데이터는 옆에 회색 [샘플] 배지가 붙어 있습니다.',
+      '실제 데이터를 입력하기 시작할 때, 오른쪽 위 빨간 [샘플 데이터 삭제]로 한 번에 정리합니다.',
+      '삭제 전에 확인창이 뜨니 안심하고 사용하세요. (실제 입력분은 지워지지 않음)',
+    ],
+  },
+  {
+    n: '08',
+    title: '영문(EN) 자동 번역 — CSV로 한 번에',
+    body: [
+      '엑셀(CSV)에 한글(KO) 열만 채우고, 영문(EN) 열은 비워 둡니다. (번호·업체명 등 공통값은 그대로)',
+      '관리자 상단 [🌐 EN 번역 프롬프트] 버튼을 누르고, [프롬프트 복사]를 누릅니다.',
+      'Claude 채팅창에 그 프롬프트를 붙여넣고, 바로 아래에 KO를 채운 CSV를 붙여넣습니다.',
+      'Claude가 영문(EN) 열이 채워진 CSV를 돌려줍니다. 그대로 복사해 둡니다.',
+      '행이 아주 많으면(수백~수천) 200~500행씩 나눠서 여러 번 요청하면 됩니다.',
+      '브랜드명·인증명(ISO 22716 등)·번호는 번역되지 않고 원문이 유지됩니다.',
+      '그 완성된 CSV를 [CSV 업로드]로 한 번에 등록합니다. (아래 09번 참고)',
+    ],
+  },
+  {
+    n: '09',
+    title: '엑셀(.xlsx) 일괄 등록 — 공급사·전시',
+    body: [
+      '[공급사] 또는 [전시] 탭 상단의 "엑셀 일괄" 상자를 사용합니다.',
+      '① [⬇ 엑셀 양식 다운로드] — 드롭다운이 들어간 .xlsx 양식을 받습니다. (상단 [📋 양식 모음]에서도 받을 수 있음)',
+      '② 엑셀에서 채웁니다. 유형·MOQ·리드타임·국가·상태 같은 칸은 셀을 누르면 드롭다운이 떠서 목록에서 고릅니다. (직접 타이핑 아님)',
+      '제품군은 여러 개일 수 있어 제품군1·2·3 칸으로 나눠 각각 드롭다운에서 고릅니다. (한 개만 있으면 제품군1만 채움)',
+      'MOQ·리드타임은 숫자 구간만 고릅니다. 단위(개·일)는 사이트 화면에 자동으로 붙으니 엑셀에는 쓰지 않습니다.',
+      '맨 앞 [번호]가 각 항목의 고유 열쇠입니다. 비워두면 신규로 추가됩니다.',
+      '③ [⬆ 파일 업로드] — 파일을 고르면 "신규 / 수정 / 오류" 건수를 미리 보여줍니다.',
+      '④ 내용을 확인하고 [○건 반영]을 눌러야 실제로 저장됩니다. (누르기 전엔 반영 안 됨)',
+      '같은 [번호]로 다시 올리면 새로 생기지 않고 그 항목이 수정됩니다. (중복 걱정 없음)',
+      '파일에 없는 기존 항목은 삭제되지 않습니다. 일부만 골라 올려도 안전합니다.',
+      '인증·수출시장·참가 공급사처럼 목록에 없는 여러 값은 세로줄(|)로 구분해 적습니다. 예: ISO 22716|CGMP',
+      '[↧ 현재 데이터 내보내기]로 지금 등록된 전체를 CSV로 받아, 수정 후 다시 올릴 수 있습니다. (.csv·.xlsx 모두 업로드 가능)',
+    ],
+  },
+]
+
+const upcoming = [
+  '이미지 일괄 업로드 — 파일 여러 장을 한 번에 (번호로 자동 매칭)',
+  '자동 백업 & 복원 — 잘못 올려도 이전 버전으로 되돌리기 (경고창 포함)',
+]
+
+const faq = [
+  ['이미지는 꼭 넣어야 하나요?', '아니요. 비워도 저장됩니다. 있으면 URL을 붙여넣으세요.'],
+  ['잘못 저장했어요.', '목록에서 [수정]으로 고치거나 [삭제]로 지우면 됩니다. (곧 백업/복원 기능도 추가됩니다)'],
+  ['입력한 게 진짜 저장되나요?', '네. 저장하면 데이터베이스(Supabase)에 바로 반영되어 사이트에 나타납니다.'],
+  ['한글/영문 둘 다 꼭 써야 하나요?', '가능하면 둘 다 권장하지만, 한쪽만 있어도 저장됩니다.'],
+]
+
+export default function AdminManualPage() {
+  return (
+    <div className="min-h-screen bg-white text-gray-800">
+      <style>{`@media print { .no-print { display: none !important; } body { background: #fff; } .manual-page { padding: 0 !important; } }`}</style>
+
+      {/* Toolbar (hidden when printing) */}
+      <div className="no-print sticky top-0 z-10 border-b bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
+          <Link href="/admin" className="text-sm font-medium text-gray-600 hover:text-gray-900">← 관리자로 돌아가기</Link>
+          <button onClick={() => window.print()} className="rounded-lg bg-[var(--color-theme-500)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-theme-600)]">
+            PDF 다운로드
+          </button>
+        </div>
+      </div>
+
+      <div className="manual-page mx-auto max-w-3xl px-6 py-10">
+        <header className="mb-10 border-b pb-6">
+          <h1 className="text-3xl font-bold text-gray-900">PICKCOS 관리자 사용 설명서</h1>
+          <p className="mt-2 text-gray-500">처음 쓰는 분도 따라 하기 쉽게 정리했습니다. 위 [PDF 다운로드]로 저장/인쇄할 수 있습니다.</p>
+        </header>
+
+        <div className="space-y-8">
+          {steps.map((s) => (
+            <section key={s.n} className="flex gap-4">
+              <div className="flex-shrink-0">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-theme-50)] text-sm font-bold text-[var(--color-theme-700)]">{s.n}</div>
+              </div>
+              <div>
+                <h2 className="mb-2 text-lg font-bold text-gray-900">{s.title}</h2>
+                <ol className="list-decimal space-y-1.5 pl-5 text-[15px] leading-relaxed text-gray-700 marker:text-gray-400">
+                  {s.body.map((line, i) => <li key={i}>{line}</li>)}
+                </ol>
+              </div>
+            </section>
+          ))}
+        </div>
+
+        {/* Upcoming */}
+        <section className="mt-10 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
+          <h2 className="mb-2 text-base font-bold text-gray-800">곧 추가될 기능</h2>
+          <ul className="list-disc space-y-1 pl-5 text-[14px] text-gray-600 marker:text-gray-400">
+            {upcoming.map((u, i) => <li key={i}>{u}</li>)}
+          </ul>
+        </section>
+
+        {/* FAQ */}
+        <section className="mt-8">
+          <h2 className="mb-3 text-lg font-bold text-gray-900">자주 묻는 질문</h2>
+          <div className="space-y-3">
+            {faq.map(([q, a], i) => (
+              <div key={i} className="rounded-lg border p-4">
+                <p className="text-[15px] font-semibold text-gray-900">Q. {q}</p>
+                <p className="mt-1 text-[14px] text-gray-600">A. {a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <footer className="mt-12 border-t pt-6 text-center text-xs text-gray-400">
+          PICKCOS 관리자 · 도움이 필요하면 담당자에게 문의하세요.
+        </footer>
+      </div>
+    </div>
+  )
+}

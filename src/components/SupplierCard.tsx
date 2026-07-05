@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { formatMoq, formatLeadTime } from '@/lib/options'
 
 interface SupplierCardProps {
   id: string
@@ -69,8 +70,8 @@ export default function SupplierCard({
           </p>
         )}
         <div className="text-[13px] text-[var(--color-sub-text)] space-y-1 mb-4">
-          <div>MOQ: {moqRange}</div>
-          <div>Lead Time: {leadTimeRange}</div>
+          <div>MOQ: {formatMoq(moqRange)}</div>
+          <div>Lead Time: {formatLeadTime(leadTimeRange)}</div>
         </div>
         {capabilities && capabilities.length > 0 && (
           <div className="flex flex-wrap gap-2">

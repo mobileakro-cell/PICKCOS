@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { listAll, insertOne, patchOne, removeOne } from '@/lib/db'
+import { listAll, insertOne, patchOne, removeOne, upsertOne } from '@/lib/db'
 import type { Exhibition } from '@/lib/types'
 import { getAdmin } from '@/lib/auth'
 
@@ -40,27 +40,47 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const body = await request.json()
-  const exhibition = await insertOne('exhibition', body)
-  return NextResponse.json(exhibition, { status: 201 })
+  try {
+    const body = await request.json()
+    // CSV import sends a 번호(id) → upsert so the number stays a stable key
+    if (body.id) {
+      await upsertOne('exhibition', String(body.id), { ...body, id: String(body.id) })
+      return NextResponse.json({ ...body }, { status: 201 })
+    }
+    const exhibition = await insertOne('exhibition', body)
+    return NextResponse.json(exhibition, { status: 201 })
+  } catch (error) {
+    console.error('Exhibition create error:', error)
+    return NextResponse.json({ error: 'Failed to create exhibition' }, { status: 500 })
+  }
 }
 
 export async function PUT(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const body = await request.json()
-  const { id, ...data } = body
-  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const updated = await patchOne<Exhibition>('exhibition', id, data)
-  if (!updated) return NextResponse.json({ error: 'Exhibition not found' }, { status: 404 })
-  return NextResponse.json(updated)
+  try {
+    const body = await request.json()
+    const { id, ...data } = body
+    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const updated = await patchOne<Exhibition>('exhibition', id, data)
+    if (!updated) return NextResponse.json({ error: 'Exhibition not found' }, { status: 404 })
+    return NextResponse.json(updated)
+  } catch (error) {
+    console.error('Exhibition update error:', error)
+    return NextResponse.json({ error: 'Failed to update exhibition' }, { status: 500 })
+  }
 }
 
 export async function DELETE(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const { searchParams } = new URL(request.url)
-  const id = searchParams.get('id')
-  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const deleted = await removeOne('exhibition', id)
-  if (!deleted) return NextResponse.json({ error: 'Exhibition not found' }, { status: 404 })
-  return NextResponse.json({ success: true })
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const deleted = await removeOne('exhibition', id)
+    if (!deleted) return NextResponse.json({ error: 'Exhibition not found' }, { status: 404 })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Exhibition delete error:', error)
+    return NextResponse.json({ error: 'Failed to delete exhibition' }, { status: 500 })
+  }
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { formatMoq, formatLeadTime } from '@/lib/options'
 
 interface BilingualText {
   ko: string
@@ -163,11 +164,11 @@ export default function SupplierDetailPage({ params }: { params: { id: string } 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-border">
             <div>
               <p className="text-[10px] uppercase tracking-widest text-mocha-gray font-medium mb-2">{t('supplier.moq')}</p>
-              <p className="text-lg font-bold text-charcoal">{supplier.moqRange || 'N/A'}</p>
+              <p className="text-lg font-bold text-charcoal">{formatMoq(supplier.moqRange, lang)}</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-widest text-mocha-gray font-medium mb-2">{t('supplier.lead_time')}</p>
-              <p className="text-lg font-bold text-charcoal">{supplier.leadTimeRange || 'N/A'}</p>
+              <p className="text-lg font-bold text-charcoal">{formatLeadTime(supplier.leadTimeRange, lang)}</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-widest text-mocha-gray font-medium mb-2">{t('supplier.export_markets')}</p>

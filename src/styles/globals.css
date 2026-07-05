@@ -42,6 +42,8 @@
   --color-theme-800: #085041;
   --color-theme-900: #04342C;
   --color-text-main: #1C1A17;
+  /* admin UI accent → enables bg-primary / text-primary / border-primary */
+  --color-primary: #1D9E75;
   --color-border: #ECE7DE;
   --color-gray-line: #ECE7DE;
   --color-gray-text: #73695C;

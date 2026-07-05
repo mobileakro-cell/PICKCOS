@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  if (!getAdmin(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20', 10)
   const all = await listAll<MemberSignup>('member')
   return NextResponse.json({ members: all.slice(-limit).reverse(), total: all.length })

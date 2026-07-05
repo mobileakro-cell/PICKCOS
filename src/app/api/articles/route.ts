@@ -57,27 +57,42 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const body = await request.json()
-  const article = await insertOne('article', body)
-  return NextResponse.json(article, { status: 201 })
+  try {
+    const body = await request.json()
+    const article = await insertOne('article', body)
+    return NextResponse.json(article, { status: 201 })
+  } catch (error) {
+    console.error('Article create error:', error)
+    return NextResponse.json({ error: 'Failed to create article' }, { status: 500 })
+  }
 }
 
 export async function PUT(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const body = await request.json()
-  const { id, ...data } = body
-  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const updated = await patchOne<Article>('article', id, data)
-  if (!updated) return NextResponse.json({ error: 'Article not found' }, { status: 404 })
-  return NextResponse.json(updated)
+  try {
+    const body = await request.json()
+    const { id, ...data } = body
+    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const updated = await patchOne<Article>('article', id, data)
+    if (!updated) return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    return NextResponse.json(updated)
+  } catch (error) {
+    console.error('Article update error:', error)
+    return NextResponse.json({ error: 'Failed to update article' }, { status: 500 })
+  }
 }
 
 export async function DELETE(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const { searchParams } = new URL(request.url)
-  const id = searchParams.get('id')
-  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const deleted = await removeOne('article', id)
-  if (!deleted) return NextResponse.json({ error: 'Article not found' }, { status: 404 })
-  return NextResponse.json({ success: true })
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const deleted = await removeOne('article', id)
+    if (!deleted) return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Article delete error:', error)
+    return NextResponse.json({ error: 'Failed to delete article' }, { status: 500 })
+  }
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { listAll, insertOne } from '@/lib/db'
+import { listAll, insertOne, patchOne } from '@/lib/db'
 import { getAdmin } from '@/lib/auth'
 
 interface MatchingRequest {
@@ -22,7 +22,15 @@ interface MatchingRequest {
   createdAt: string
 }
 
+// Public matching submissions are currently closed (event capacity reached) — the
+// /request-matching page shows a "매칭 신청이 마감되었습니다" notice. Flip to false
+// to reopen, and keep it in sync with the UI notice.
+const SUBMISSIONS_CLOSED = true
+
 export async function POST(request: NextRequest) {
+  if (SUBMISSIONS_CLOSED) {
+    return NextResponse.json({ error: '매칭 신청이 마감되었습니다.' }, { status: 403 })
+  }
   try {
     const body = await request.json()
 
@@ -115,5 +123,20 @@ export async function GET(request: NextRequest) {
       { error: 'Failed to fetch requests' },
       { status: 500 }
     )
+  }
+}
+
+// Admin-only: update a matching request's status.
+export async function PATCH(request: NextRequest) {
+  if (!getAdmin(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const { id, status } = await request.json()
+    if (!id || !status) return NextResponse.json({ error: 'Missing id or status' }, { status: 400 })
+    const updated = await patchOne('matchingRequest', id, { status })
+    if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error('Error updating matching request:', error)
+    return NextResponse.json({ error: 'Failed to update request' }, { status: 500 })
   }
 }

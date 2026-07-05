@@ -99,6 +99,22 @@ export async function removeOne(collection: string, id: string): Promise<boolean
   }
 }
 
+// Delete every sample-flagged record across all collections. Returns the count.
+export async function clearSamples(): Promise<number> {
+  if (!USE_DB) {
+    let n = 0
+    for (const col of Object.keys(mem)) {
+      for (const [id, v] of mem[col]) {
+        if (v?.sample) { mem[col].delete(id); n++ }
+      }
+    }
+    return n
+  }
+  const prisma = await client()
+  const res = await prisma.entity.deleteMany({ where: { data: { path: ['sample'], equals: true } } })
+  return res.count
+}
+
 // ── Supplier wrappers (used by existing routes) ──
 export const getSuppliers = () => listAll<Supplier>('supplier')
 export const getSupplier = (id: string) => getOne<Supplier>('supplier', id)

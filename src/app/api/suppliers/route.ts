@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSuppliers, createSupplier, editSupplier, removeSupplier } from '@/lib/db'
+import { getSuppliers, createSupplier, editSupplier, removeSupplier, upsertOne } from '@/lib/db'
 import { REGION_MAP, type Supplier } from '@/lib/types'
 import { getAdmin } from '@/lib/auth'
 
@@ -75,27 +75,47 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const body = await request.json()
-  const supplier = await createSupplier(body)
-  return NextResponse.json(supplier, { status: 201 })
+  try {
+    const body = await request.json()
+    // CSV import sends a 번호(id) → upsert so the number stays a stable key
+    if (body.id) {
+      await upsertOne('supplier', String(body.id), { ...body, id: String(body.id) })
+      return NextResponse.json({ ...body }, { status: 201 })
+    }
+    const supplier = await createSupplier(body)
+    return NextResponse.json(supplier, { status: 201 })
+  } catch (error) {
+    console.error('Supplier create error:', error)
+    return NextResponse.json({ error: 'Failed to create supplier' }, { status: 500 })
+  }
 }
 
 export async function PUT(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const body = await request.json()
-  const { id, ...data } = body
-  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const updated = await editSupplier(id, data)
-  if (!updated) return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
-  return NextResponse.json(updated)
+  try {
+    const body = await request.json()
+    const { id, ...data } = body
+    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const updated = await editSupplier(id, data)
+    if (!updated) return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
+    return NextResponse.json(updated)
+  } catch (error) {
+    console.error('Supplier update error:', error)
+    return NextResponse.json({ error: 'Failed to update supplier' }, { status: 500 })
+  }
 }
 
 export async function DELETE(request: NextRequest) {
   if (!getAdmin(request)) return unauthorized()
-  const { searchParams } = new URL(request.url)
-  const id = searchParams.get('id')
-  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const deleted = await removeSupplier(id)
-  if (!deleted) return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
-  return NextResponse.json({ success: true })
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const deleted = await removeSupplier(id)
+    if (!deleted) return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Supplier delete error:', error)
+    return NextResponse.json({ error: 'Failed to delete supplier' }, { status: 500 })
+  }
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { formatMoq, formatLeadTime } from '@/lib/options'
 
 interface BL {
   ko: string
@@ -254,8 +255,8 @@ export default function ArticleDetailPage({ params }: { params: { slug: string }
                     </h3>
                     <p className="text-xs text-mocha-gray mb-2">{supplier.location[lang]}</p>
                     <div className="flex gap-4 text-xs text-mocha-gray pt-3 border-t border-border">
-                      <span>MOQ: {supplier.moqRange}</span>
-                      <span>Lead: {supplier.leadTimeRange}</span>
+                      <span>MOQ: {formatMoq(supplier.moqRange, lang)}</span>
+                      <span>Lead: {formatLeadTime(supplier.leadTimeRange, lang)}</span>
                     </div>
                   </div>
                 </Link>

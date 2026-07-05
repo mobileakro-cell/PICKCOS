@@ -17,8 +17,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 22716', 'GMPC', 'K-Beauty Certified'],
     moq: 1000,
     leadTime: 45,
-    moqRange: '1,000 - 50,000 units',
-    leadTimeRange: '45 - 90 days',
+    moqRange: '1,000 - 50,000',
+    leadTimeRange: '45 - 90',
     description: bl(
       'Premium OEM manufacturer specializing in skincare formulations',
       '스킨케어 포뮬레이션 전문 프리미엄 OEM 제조업체'
@@ -63,8 +63,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 9001', 'Vegan Certified'],
     moq: 5000,
     leadTime: 30,
-    moqRange: '5,000 - 100,000 units',
-    leadTimeRange: '30 - 60 days',
+    moqRange: '5,000 - 100,000',
+    leadTimeRange: '30 - 60',
     description: bl('Eco-friendly packaging solutions for cosmetics', '화장품을 위한 친환경 패키징 솔루션'),
     descriptionFull: bl(
       'PackagingInnovators specializes in sustainable, innovative packaging solutions for the cosmetics industry.',
@@ -105,8 +105,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 22716', 'Organic Certified', 'Non-GMO'],
     moq: 100,
     leadTime: 60,
-    moqRange: '100 - 10,000 kg',
-    leadTimeRange: '60 - 90 days',
+    moqRange: '100 - 10,000',
+    leadTimeRange: '60 - 90',
     description: bl('Premium natural and organic beauty ingredients sourced from Korea', '한국산 프리미엄 천연 & 유기농 뷰티 원료'),
     descriptionFull: bl(
       'IngredientsKorea supplies premium natural beauty ingredients including fermented extracts, peptides, and plant-derived actives.',
@@ -146,8 +146,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 22716', 'GMPC', 'FDA Listed'],
     moq: 2000,
     leadTime: 50,
-    moqRange: '2,000 - 100,000 units',
-    leadTimeRange: '50 - 120 days',
+    moqRange: '2,000 - 100,000',
+    leadTimeRange: '50 - 120',
     description: bl('Full-service contract manufacturer with advanced facilities', '첨단 시설을 갖춘 풀서비스 위탁 제조업체'),
     descriptionFull: bl(
       'KoreanContractMfg provides comprehensive manufacturing services from concept to shelf, with ISO-certified facilities.',
@@ -187,8 +187,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['COSMOS', 'Vegan Certified', 'Cruelty-Free'],
     moq: 500,
     leadTime: 45,
-    moqRange: '500 - 50,000 units',
-    leadTimeRange: '45 - 90 days',
+    moqRange: '500 - 50,000',
+    leadTimeRange: '45 - 90',
     description: bl('Specialized in clean, sustainable beauty products', '클린, 지속 가능한 뷰티 제품 전문'),
     descriptionFull: bl(
       'GreenBeauty Solutions specializes in formulating clean beauty products with natural and sustainable ingredients.',
@@ -227,8 +227,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 22716', 'GMPC', 'CPNP Registered'],
     moq: 3000,
     leadTime: 60,
-    moqRange: '3,000 - 200,000 units',
-    leadTimeRange: '60 - 120 days',
+    moqRange: '3,000 - 200,000',
+    leadTimeRange: '60 - 120',
     description: bl('Full ODM service with in-house R&D center and 200+ formulation library', '자체 R&D 센터와 200개 이상의 포뮬레이션 라이브러리를 갖춘 풀 ODM 서비스'),
     descriptionFull: bl(
       'AmoreLab Co. is a premier ODM partner with a state-of-the-art R&D center housing over 200 proprietary formulations ready for private labeling.',
@@ -268,8 +268,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 9001', 'FSC Certified', 'PCR Certified'],
     moq: 10000,
     leadTime: 35,
-    moqRange: '10,000 - 500,000 units',
-    leadTimeRange: '35 - 75 days',
+    moqRange: '10,000 - 500,000',
+    leadTimeRange: '35 - 75',
     description: bl('Premium luxury packaging with sustainable material options and custom tooling', '지속 가능한 소재 옵션과 맞춤 툴링을 갖춘 프리미엄 럭셔리 패키징'),
     descriptionFull: bl(
       'K-Pack Global delivers premium luxury packaging solutions for prestige beauty brands. Specializing in custom molds, metallic finishes, and sustainable alternatives.',
@@ -309,8 +309,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 22716', 'COSMOS Natural', 'ECOCERT'],
     moq: 50,
     leadTime: 45,
-    moqRange: '50 - 5,000 kg',
-    leadTimeRange: '45 - 75 days',
+    moqRange: '50 - 5,000',
+    leadTimeRange: '45 - 75',
     description: bl('Patented fermentation technology producing high-potency bioactive ingredients', '고농도 생리활성 원료를 생산하는 특허 발효 기술'),
     descriptionFull: bl(
       'BioFerment Korea utilizes proprietary fermentation processes derived from traditional Korean fermentation science to create next-generation bioactive ingredients.',
@@ -349,8 +349,8 @@ export let mockSuppliers: Supplier[] = [
     certifications: ['ISO 13485', 'CE Marked', 'FDA 510(k)'],
     moq: 500,
     leadTime: 90,
-    moqRange: '500 - 50,000 units',
-    leadTimeRange: '90 - 150 days',
+    moqRange: '500 - 50,000',
+    leadTimeRange: '90 - 150',
     description: bl('Beauty device and skincare tool manufacturer with patented LED and microcurrent technology', '특허 LED 및 미세전류 기술을 보유한 뷰티 디바이스 및 스킨케어 도구 제조업체'),
     descriptionFull: bl(
       'SkinTech Manufacturing produces cutting-edge beauty devices including LED masks, microcurrent tools, and ultrasonic skin scrubbers for global beauty brands.',
