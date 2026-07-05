@@ -19,7 +19,7 @@ function generateTicketId(): string {
 // Public inquiry submissions are currently closed (event capacity reached) — the
 // /contact page shows a "신청이 마감되었습니다" notice. Flip to false to reopen,
 // and keep it in sync with the UI notice.
-const SUBMISSIONS_CLOSED = true
+const SUBMISSIONS_CLOSED = false
 
 export async function POST(request: NextRequest) {
   if (SUBMISSIONS_CLOSED) {
