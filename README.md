@@ -22,15 +22,23 @@ PICKCOS is a Next.js-based B2B sourcing platform that streamlines the process of
 
 ### Additional Features
 - **Sourcing Hub** - Central hub for supplier discovery with pagination (12 suppliers per page)
-- **News & Insights** - 5+ articles covering K-Beauty trends, regulations, sustainability, sourcing tips, and quality assurance
-- **Trade Exhibitions** - 9 upcoming and past beauty trade shows where suppliers participate
-- **Supplier Matching** - 4-step form to get matched with suppliers based on specific requirements
-- **Contact Form** - 3-step inquiry form with category and market selection
+- **News & Insights** - Articles covering K-Beauty trends, regulations, sustainability, sourcing tips, and quality assurance
+- **Trade Exhibitions** - Upcoming and past beauty trade shows where suppliers participate
+- **Supplier Matching** - 4-step matching request form *(submissions currently closed — event capacity reached)*
+- **Contact Form** - 3-step inquiry form *(submissions currently closed — event capacity reached)*
+- **Member Registration** - Open sign-up form (`/register`) persisted to the database
 - **About Page** - Company mission, vision, supplier curation process, ambassador showcase, and values
+- **Bilingual (KR/EN)** - Full Korean/English i18n via a language context and string table
+- **Admin Panel** (`/admin`) - Auth-protected dashboard for managing suppliers, articles, exhibitions, site settings, and viewing inquiries / matching requests / members; includes Excel/CSV import & export and Supabase image upload
 - **Responsive Design** - Mobile-first responsive design with hamburger menu for mobile
 - **Global Navigation** - Persistent header (sticky) and footer across all pages
 
-## 📊 Mock Data
+## 📊 Seed / Sample Data
+
+Content lives in Postgres (see **Data Layer** below). The repo ships seed data
+(`prisma/seed.ts`, flagged `sample: true`) so a fresh database — or local dev with
+no database — is usable out of the box. Sample rows can be wiped from the admin
+panel ("clear samples") before going live.
 
 **Suppliers**: 5 verified suppliers
 - BeautySourceKr (OEM) - Seoul
@@ -63,7 +71,12 @@ PICKCOS is a Next.js-based B2B sourcing platform that streamlines the process of
 - **Language**: TypeScript
 - **UI Framework**: React 18
 - **Styling**: Tailwind CSS v4 with custom primary color (RGB 255, 149, 0)
+- **Database**: PostgreSQL (Supabase) via Prisma — with an in-memory seed fallback when `DATABASE_URL` is unset
+- **File Storage**: Supabase Storage (admin image uploads)
+- **Auth**: HMAC-signed admin session cookie (`src/lib/auth.ts`)
+- **i18n**: React context + string table (`src/lib/i18n`), Korean/English
 - **Forms**: react-hook-form + zod validation
+- **Excel/CSV**: exceljs (`src/lib/xlsx.ts`, `src/lib/csv.ts`)
 - **API**: Next.js Route Handlers
 - **State Management**: React hooks (useState, useEffect)
 - **Routing**: Next.js dynamic routes with URL search parameters
@@ -101,49 +114,99 @@ src/
 │   ├── ExhibitionCard.tsx             # Reusable exhibition card
 │   └── ArticleCard.tsx                # Reusable article card
 ├── lib/
-│   ├── mock.ts                        # Mock data (suppliers, articles, exhibitions, ambassadors)
-│   ├── types.ts                       # TypeScript type definitions
-│   └── utils.ts                       # Utility functions (if any)
+│   ├── db.ts                          # Data layer: Prisma (Postgres) with in-memory seed fallback
+│   ├── prisma.ts                      # Prisma client singleton
+│   ├── auth.ts                        # HMAC-signed admin session helpers
+│   ├── mock.ts                        # Seed/sample data + local fallback source
+│   ├── csv.ts / xlsx.ts               # CSV/Excel import & export helpers
+│   ├── options.ts                     # Shared select/option constants
+│   ├── i18n/                          # Language context + KR/EN string table
+│   └── types.ts                       # TypeScript type definitions (bilingual BL types)
 └── styles/
     └── globals.css                    # Global Tailwind styles
+
+prisma/
+├── schema.prisma                      # Single generic Entity table (collection + id + JSON)
+└── seed.ts                            # Seeds sample suppliers/articles/exhibitions
+
+src/app/admin/                         # Admin dashboard (page.tsx) + manual (manual/page.tsx)
 ```
+
+## 🗄️ Data Layer
+
+Persistence goes through `src/lib/db.ts`, which exposes a generic per-collection API
+(`listAll`, `getOne`, `insertOne`, `patchOne`, `upsertOne`, `removeOne`). All
+collections (`supplier`, `article`, `exhibition`, `inquiry`, `matchingRequest`,
+`member`, `setting`) are stored as JSON rows in one `Entity` table
+(`prisma/schema.prisma`); filtering happens in the API layer since the dataset is small.
+
+- If `DATABASE_URL` is set → Postgres via Prisma.
+- If not (local dev with no DB) → an in-memory store seeded from `src/lib/mock.ts`, so
+  the site runs with zero setup.
 
 ## 🔌 API Endpoints
 
 All endpoints return JSON responses with pagination support where applicable.
+Write methods (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid admin session cookie.
 
 ### Suppliers
-- `GET /api/suppliers` - List suppliers with filters (category, region, search, pagination)
+- `GET /api/suppliers` - List suppliers with filters (category, region, products, search, pagination)
+- `POST` / `PUT` / `DELETE /api/suppliers` - Create / update / delete (admin)
 - `GET /api/suppliers/[id]` - Get single supplier detail
 - `GET /api/suppliers/[id]/exhibitions` - Get exhibitions for a supplier
 
 ### Articles & News
-- `GET /api/articles` - List articles with filters (category, region, search)
+- `GET /api/articles` - List articles with filters (category, region, headline, search)
+- `POST` / `PUT` / `DELETE /api/articles` - Create / update / delete (admin)
 - `GET /api/articles/[slug]` - Get single article detail
 - `GET /api/articles/[slug]/related-suppliers` - Get related suppliers for article
 
 ### Exhibitions
 - `GET /api/exhibitions` - List exhibitions with filters (status, region)
+- `POST` / `PUT` / `DELETE /api/exhibitions` - Create / update / delete (admin)
 
-### Other
-- `GET /api/ambassadors` - List all ambassadors
+### Leads (inquiries / matching / members)
+- `POST /api/inquiries` - Submit an inquiry *(currently closed → 403)*; `GET` / `PATCH` status (admin)
+- `POST /api/matching-requests` - Submit a matching request *(currently closed → 403)*; `GET` / `PATCH` status (admin)
+- `POST /api/register` - Member sign-up (open); `GET` list (admin)
+
+### Admin & Utilities
+- `POST` / `DELETE /api/admin-auth` - Admin login / logout
+- `DELETE /api/admin/clear-samples` - Remove all sample-flagged rows (admin)
+- `GET` / `POST /api/settings` - Read (public) / update (admin) site settings
+- `POST /api/upload` - Upload an image to Supabase Storage (admin)
+- `POST /api/parse-sheet` / `GET /api/template` - Excel/CSV import parsing & template download (admin)
+- `GET /api/ambassadors` - List all ambassadors (static)
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+ and npm
+- (Optional) A PostgreSQL/Supabase database — omit `DATABASE_URL` to run on the seed fallback
 
 ### Installation
 
 ```bash
-# Clone or navigate to project directory
-cd website_0131
+# Navigate to the project directory
+cd MYNEWSITE
 
-# Install dependencies
+# Install dependencies (postinstall runs `prisma generate`)
 npm install
 
-# Install required packages (if not already installed)
-npm install @hookform/resolvers react-hook-form zod
+# Configure environment
+cp .env.example .env
+# then fill in DATABASE_URL / DIRECT_URL, ADMIN_ID / ADMIN_PW, SESSION_SECRET,
+# and (for image upload) the SUPABASE_* values
+```
+
+### Database setup (only when using a real database)
+
+```bash
+# Push the Prisma schema to the database
+npm run db:push
+
+# Seed sample data
+npm run db:seed
 ```
 
 ### Development
@@ -228,17 +291,20 @@ npm run type-check
 ## 🔧 Configuration
 
 ### Dynamic Routes
-Pages with user interaction (forms, filters) are configured as `force-dynamic` to prevent caching:
+Pages with user interaction (forms, filters) or live data are configured as
+`force-dynamic` to prevent caching:
 - `/contact`
 - `/exhibitions`
 - `/request-matching`
 - `/sourcing`
+- `/admin`
 
 ### Next.js Settings
 - App Router enabled
 - TypeScript strict mode
 - Tailwind CSS v4
-- Image optimization enabled
+- Images use plain `<img>` tags (the Next.js image optimizer is not used, so no
+  `images.domains` config is required)
 
 ## 📚 Data Models
 
@@ -301,46 +367,44 @@ Pages with user interaction (forms, filters) are configured as `force-dynamic` t
 1. **User navigates** → Page loads
 2. **Page renders** → Component mounts
 3. **useEffect hook** → Fetches data from `/api/*`
-4. **API route** → Filters mock data based on query params
+4. **API route** → Reads from Postgres via `src/lib/db.ts` (or the seed fallback) and filters by query params
 5. **State updates** → Components re-render with data
-6. **User interactions** → Forms submit, filters update URL params
+6. **User interactions** → Forms submit (persisted to the database), filters update URL params
 7. **useSearchParams()** → URL query params update page
 
 ## 🚨 Known Issues & Limitations
 
-- Mock data is hardcoded (no database)
-- Form submissions are logged to console only
-- File downloads link to Placeholder API
-- Exhibition booth assignments are limited
-- No user authentication/authorization
-- No email notifications for inquiries
+- Ambassadors are still served from static data (`src/lib/mock.ts`); no admin CRUD for them
+- Contact and matching-request submissions are intentionally closed (UI notice + `403` from the API); flip `SUBMISSIONS_CLOSED` in the respective routes to reopen
+- Data is stored as JSON in a single generic `Entity` table — fine at the current scale, but not indexed per-field (see "future enhancements")
+- No email notifications for inquiries/registrations
 
 ## 🎯 Future Enhancements
 
-1. **Backend Integration**
-   - Connect to real database (MongoDB, PostgreSQL)
-   - Implement actual form submission and data storage
-   - User authentication and accounts
+1. **Data model**
+   - Migrate the single JSON `Entity` table to typed Prisma models with per-field indexes and foreign keys (once past MVP scale)
+   - Database-level filtering/pagination instead of in-memory
 
 2. **Advanced Features**
+   - Ambassador management in the admin panel
    - Supplier ratings and reviews
-   - Inquiry tracking dashboard
    - Advanced search with saved searches
-   - Real file uploads
-   - Email notifications
-   - Admin dashboard for supplier management
+   - Email notifications for new leads/members
 
 3. **Performance**
-   - Image optimization and lazy loading
-   - API response caching
-   - Database indexing
+   - Lazy loading and API response caching
 
 4. **UX Improvements**
-   - Multi-language support
    - Dark mode
-   - Advanced filters with more options
    - Saved favorites/bookmarks
    - Detailed analytics
+
+## ✅ Already Implemented
+
+Backend integration (Postgres/Prisma), real form persistence, admin authentication,
+an admin dashboard (supplier/article/exhibition CRUD, lead & member views, settings),
+real image uploads (Supabase Storage), Excel/CSV import & export, and KR/EN
+multi-language support are all in place.
 
 ## 📧 Support
 
@@ -352,6 +416,6 @@ This project is proprietary and confidential.
 
 ---
 
-**Last Updated**: January 31, 2025
-**Version**: 1.0.0
-**Status**: Development/Beta
+**Last Updated**: July 5, 2026
+**Version**: 1.1.0
+**Status**: Beta — pre-launch

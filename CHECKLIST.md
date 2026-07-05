@@ -1,5 +1,24 @@
 # PICKCOS Platform - Feature Checklist
 
+> **Update — 2026-07-05**
+> The checklist below captures the original MVP (mock-data) milestone. Since then
+> the platform has moved well past it:
+> - **Persistence**: migrated from mock/file data to **PostgreSQL (Supabase) via Prisma**,
+>   with an in-memory seed fallback for local dev.
+> - **Admin panel** (`/admin`): auth-protected dashboard with full CRUD for suppliers,
+>   articles, exhibitions and site settings, plus **Excel/CSV import & export** and
+>   **Supabase Storage image upload**.
+> - **Lead management**: contact **inquiries**, **matching requests**, and **member
+>   registrations** are persisted and viewable in the admin panel; inquiry/matching
+>   status is editable and saved server-side.
+> - **Security/stability**: admin session auth (HMAC cookie), admin guards on all write
+>   and lead endpoints, and `try/catch` error handling across CRUD routes.
+> - **i18n**: full **Korean/English** support.
+> - **Closed forms**: `/contact` and `/request-matching` submissions are intentionally
+>   closed (UI notice + `403` from the API).
+>
+> Counts and "mock data" references further down are historical.
+
 ## ✅ Completed Features
 
 ### Pages
