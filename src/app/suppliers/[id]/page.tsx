@@ -247,14 +247,8 @@ export default function SupplierDetailPage({ params }: { params: { id: string } 
               </div>
               <div className="space-y-3">
                 <Link
-                  href={`/contact?type=sourcing&supplierId=${supplier.id}`}
-                  className="block w-full py-3 bg-charcoal text-ivory text-center text-xs uppercase tracking-wider font-medium rounded-pill hover:bg-graphite transition-colors"
-                >
-                  {t('supplier.send_inquiry')}
-                </Link>
-                <Link
                   href={`/request-matching?supplierId=${supplier.id}`}
-                  className="block w-full py-3 border border-border text-mocha-gray text-center text-xs uppercase tracking-wider font-medium rounded-pill hover:bg-soft-gray transition-colors"
+                  className="block w-full py-3 bg-charcoal text-ivory text-center text-xs uppercase tracking-wider font-medium rounded-pill hover:bg-graphite transition-colors"
                 >
                   {t('supplier.request_matching')}
                 </Link>
@@ -370,16 +364,10 @@ export default function SupplierDetailPage({ params }: { params: { id: string } 
           <p className="text-mocha-gray text-sm mb-8 font-light">
             {t('supplier.send_direct')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href={`/contact?type=sourcing&supplierId=${supplier.id}`}
-              className="px-8 py-3 bg-charcoal text-ivory text-xs font-medium uppercase tracking-wider rounded-pill hover:bg-graphite transition-colors"
-            >
-              {t('supplier.send_inquiry')}
-            </Link>
+          <div className="flex justify-center">
             <Link
               href={`/request-matching?supplierId=${supplier.id}`}
-              className="px-8 py-3 border border-border text-mocha-gray text-xs font-medium uppercase tracking-wider rounded-pill hover:bg-white transition-colors"
+              className="px-8 py-3 bg-charcoal text-ivory text-xs font-medium uppercase tracking-wider rounded-pill hover:bg-graphite transition-colors"
             >
               {t('supplier.request_matching')}
             </Link>

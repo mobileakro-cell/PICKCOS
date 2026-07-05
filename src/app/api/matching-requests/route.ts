@@ -9,7 +9,9 @@ interface MatchingRequest {
   category: string
   requestBrief: string
   serviceScope: string
+  referenceProduct?: string
   expectedMoq: string
+  packagingFormat?: string
   targetMarkets?: string[]
   certificationsNeeded?: string[]
   timeline?: string
@@ -43,7 +45,9 @@ export async function POST(request: NextRequest) {
       category,
       requestBrief,
       serviceScope,
+      referenceProduct,
       expectedMoq,
+      packagingFormat,
       targetMarkets,
       certificationsNeeded,
       timeline,
@@ -85,7 +89,9 @@ export async function POST(request: NextRequest) {
       category,
       requestBrief,
       serviceScope,
+      referenceProduct,
       expectedMoq,
+      packagingFormat,
       targetMarkets: targetMarkets || [],
       certificationsNeeded: certificationsNeeded || [],
       timeline,

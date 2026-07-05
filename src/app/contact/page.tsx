@@ -11,7 +11,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 export const dynamic = 'force-dynamic'
 
 const contactSchema = z.object({
-  inquiryType: z.enum(['sourcing', 'partnership', 'general', 'support']),
+  inquiryType: z.enum(['partnership', 'general', 'support']),
   category: z.string().min(1, 'Select a category'),
   targetMarkets: z.array(z.string()).min(1, 'Select at least one market'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
@@ -40,8 +40,8 @@ const COUNTRIES = [
   'Other',
 ]
 
+// 소싱 문의는 "매칭 신청(요청서)"으로 일원화 → Contact은 일반/제휴/지원 문의 전용.
 const INQUIRY_TYPES = [
-  { value: 'sourcing', label: 'Supplier Sourcing Inquiry' },
   { value: 'partnership', label: 'Partnership Opportunity' },
   { value: 'support', label: 'Support & Assistance' },
   { value: 'general', label: 'General Inquiry' },
@@ -111,7 +111,8 @@ function ContactPageContent() {
     const supplierId = searchParams.get('supplierId')
     const topic = searchParams.get('topic')
 
-    if (type) {
+    // Only accept valid (non-sourcing) types; sourcing now routes to /request-matching.
+    if (type && INQUIRY_TYPES.some(o => o.value === type)) {
       setValue('inquiryType', type as any)
     }
   }, [searchParams, setValue])

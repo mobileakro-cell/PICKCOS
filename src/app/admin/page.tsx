@@ -47,8 +47,10 @@ interface MatchingRequest {
   category: string
   requestBrief: string
   serviceScope?: string
+  referenceProduct?: string
   targetMarkets?: string[]
   expectedMoq?: string
+  packagingFormat?: string
   timeline?: string
   companyName: string
   personName: string
@@ -975,8 +977,14 @@ export default function AdminPage() {
                             </div>
                           </td>
                           <td className="px-4 py-3">{req.category}</td>
-                          <td className="px-4 py-3 max-w-xs"><div className="line-clamp-2 text-gray-600" title={req.requestBrief}>{req.requestBrief}</div></td>
-                          <td className="px-4 py-3 whitespace-nowrap">{req.expectedMoq || '-'}</td>
+                          <td className="px-4 py-3 max-w-xs">
+                            <div className="line-clamp-2 text-gray-600" title={req.requestBrief}>{req.requestBrief}</div>
+                            {req.referenceProduct && <div className="mt-0.5 text-xs text-gray-400 line-clamp-1" title={req.referenceProduct}>참고: {req.referenceProduct}</div>}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div>{req.expectedMoq || '-'}</div>
+                            {req.packagingFormat && <div className="text-xs text-gray-400">{req.packagingFormat}</div>}
+                          </td>
                           <td className="px-4 py-3 whitespace-nowrap">{(req.createdAt || '').slice(0, 10)}</td>
                           <td className="px-4 py-3">
                             <select

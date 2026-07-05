@@ -16,7 +16,9 @@ const matchingSchema = z.object({
   category: z.string().min(1, 'Select a category'),
   requestBrief: z.string().min(10, 'Please describe your request (at least 10 characters)'),
   serviceScope: z.enum(['formula_dev', 'existing_odm', 'formula_fill', 'full_package']),
+  referenceProduct: z.string().optional(),
   expectedMoq: z.string().min(1, 'Select an expected order quantity'),
+  packagingFormat: z.string().optional(),
   targetMarkets: z.array(z.string()).optional(),
   certificationsNeeded: z.array(z.string()).optional(),
   timeline: z.string().optional(),
@@ -51,6 +53,17 @@ const SERVICE_SCOPES = [
   { value: 'existing_odm', label: { en: 'Use existing formula (ODM)', ko: '기존 처방 활용 (ODM)' } },
   { value: 'formula_fill', label: { en: 'Formula + filling', ko: '처방 + 충전' } },
   { value: 'full_package', label: { en: 'Formula + packaging (full service)', ko: '처방 + 패키징 (풀서비스)' } },
+]
+
+const PACKAGING_FORMATS = [
+  { value: 'jar', label: { en: 'Jar', ko: '자(단지)' } },
+  { value: 'tube', label: { en: 'Tube', ko: '튜브' } },
+  { value: 'airless', label: { en: 'Airless pump', ko: '에어리스 펌프' } },
+  { value: 'pump', label: { en: 'Pump bottle', ko: '펌프 보틀' } },
+  { value: 'bottle', label: { en: 'Bottle / Dropper', ko: '보틀 / 드로퍼' } },
+  { value: 'sachet', label: { en: 'Sachet / Pouch', ko: '사쉐 / 파우치' } },
+  { value: 'stick', label: { en: 'Stick', ko: '스틱' } },
+  { value: 'undecided', label: { en: 'Not decided / Ask supplier', ko: '미정 / 공급사에 문의' } },
 ]
 
 const MOQ_RANGES = [
@@ -459,6 +472,24 @@ function RequestMatchingPageContent() {
               </select>
               {errors.serviceScope && <p className="text-red-600 text-sm mt-1">{errors.serviceScope.message}</p>}
             </div>
+
+            {/* 참고 제품 / 벤치마크 (자유서술, 선택) */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {lang === 'ko' ? '참고 제품 · 벤치마크' : 'Reference / Benchmark'} <span className="font-normal text-gray-400">({lang === 'ko' ? '선택' : 'optional'})</span>
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                {lang === 'ko'
+                  ? '비슷한 제품이나 원하는 방향의 예시가 있으면 자유롭게 적어주세요.'
+                  : 'If there is a similar product or direction you have in mind, describe it freely.'}
+              </p>
+              <textarea
+                rows={2}
+                placeholder={lang === 'ko' ? '예: OO 브랜드의 XX 세럼 같은 사용감, 더 가벼운 제형' : "e.g., a texture like Brand X's serum, but lighter"}
+                {...register('referenceProduct')}
+                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
+              />
+            </div>
           </div>
         )}
 
@@ -479,6 +510,22 @@ function RequestMatchingPageContent() {
                 ))}
               </select>
               {errors.expectedMoq && <p className="text-red-600 text-sm mt-1">{errors.expectedMoq.message}</p>}
+            </div>
+
+            {/* 선호 용기 · 패키징 형태 (선택) */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {lang === 'ko' ? '선호 용기 · 패키징 형태' : 'Preferred Packaging Format'} <span className="font-normal text-gray-400">({lang === 'ko' ? '선택' : 'optional'})</span>
+              </label>
+              <select
+                {...register('packagingFormat')}
+                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
+              >
+                <option value="">{lang === 'ko' ? '선택하세요' : 'Select...'}</option>
+                {PACKAGING_FORMATS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label[lang]}</option>
+                ))}
+              </select>
             </div>
 
             {/* 희망 일정 (선택) */}
