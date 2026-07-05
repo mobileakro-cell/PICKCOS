@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function RegisterPage() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [form, setForm] = useState({ company: '', name: '', email: '', role: '', country: '', interest: '' })
   const [consent, setConsent] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -119,7 +119,12 @@ export default function RegisterPage() {
 
             <label className="flex cursor-pointer items-start gap-2.5 pt-1">
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 flex-shrink-0 accent-[var(--color-theme-500)]" style={{ padding: 0 }} />
-              <span className="text-[13px] leading-[1.5] text-[var(--color-sub-text)]">{t('register.consent')}</span>
+              <span className="text-[13px] leading-[1.5] text-[var(--color-sub-text)]">
+                {t('register.consent')}{' '}
+                <Link href="/privacy" className="underline hover:text-[var(--foreground)]" onClick={(e) => e.stopPropagation()}>
+                  {lang === 'ko' ? '개인정보처리방침' : 'Privacy Policy'}
+                </Link>
+              </span>
             </label>
 
             {error && <p className="text-[13px] text-red-600">{error}</p>}

@@ -22,6 +22,7 @@ interface MatchingRequest {
   country: string
   website?: string
   preferredChannel: string
+  privacyConsent?: boolean
   supplierId?: string
   topic?: string
   createdAt: string
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
       country,
       website,
       preferredChannel,
+      privacyConsent,
       supplierId,
       topic,
     } = body
@@ -102,6 +104,7 @@ export async function POST(request: NextRequest) {
       country,
       website,
       preferredChannel,
+      privacyConsent: !!privacyConsent,
       supplierId,
       topic,
       createdAt: new Date().toISOString(),

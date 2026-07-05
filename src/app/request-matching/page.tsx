@@ -29,6 +29,7 @@ const matchingSchema = z.object({
   country: z.string().min(1, 'Select country'),
   website: z.string().optional(),
   preferredChannel: z.enum(['Email', 'WhatsApp', 'WeChat']),
+  privacyConsent: z.boolean().refine((v) => v === true, { message: 'Please agree to the privacy policy' }),
 })
 
 type MatchingFormData = z.infer<typeof matchingSchema>
@@ -238,7 +239,7 @@ function RequestMatchingPageContent() {
     requestType: 1,
     businessStage: 2, category: 2, requestBrief: 2, serviceScope: 2,
     expectedMoq: 3,
-    companyName: 4, personName: 4, email: 4, country: 4, preferredChannel: 4,
+    companyName: 4, personName: 4, email: 4, country: 4, preferredChannel: 4, privacyConsent: 4,
   }
   const onError = (errs: Record<string, unknown>) => {
     const first = Object.keys(errs)[0]
@@ -671,6 +672,20 @@ function RequestMatchingPageContent() {
               {errors.preferredChannel && (
                 <p className="text-red-600 text-sm mt-1">{errors.preferredChannel.message}</p>
               )}
+            </div>
+
+            {/* 개인정보 수집·이용 동의 (필수) */}
+            <div>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" {...register('privacyConsent')} className="mt-0.5 w-4 h-4 flex-shrink-0" />
+                <span className="text-sm text-gray-600 leading-relaxed">
+                  {lang === 'ko' ? '개인정보 수집·이용에 동의합니다. ' : 'I agree to the collection and use of my personal information. '}
+                  <Link href="/privacy" className="underline hover:text-[#3d3d3d]">
+                    {lang === 'ko' ? '개인정보처리방침' : 'Privacy Policy'}
+                  </Link>
+                </span>
+              </label>
+              {errors.privacyConsent && <p className="text-red-600 text-sm mt-1">{errors.privacyConsent.message}</p>}
             </div>
           </div>
         )}

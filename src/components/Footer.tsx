@@ -39,8 +39,8 @@ export default function Footer() {
         <div className="border-t border-neutral-100 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] text-[var(--color-sub-text)] gap-4">
           <p>&copy; 2026 PICKCOS. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-[var(--foreground)] transition-colors">{t('footer.privacy')}</a>
-            <a href="#" className="hover:text-[var(--foreground)] transition-colors">{t('footer.terms')}</a>
+            <Link href="/privacy" className="hover:text-[var(--foreground)] transition-colors">{t('footer.privacy')}</Link>
+            <Link href="/terms" className="hover:text-[var(--foreground)] transition-colors">{t('footer.terms')}</Link>
             <Link href="/admin" className="hover:text-[var(--foreground)] transition-colors">{t('footer.admin')}</Link>
           </div>
         </div>

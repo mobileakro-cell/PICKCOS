@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter_Tight, Instrument_Sans, Noto_Sans_KR, Dancing_Script } from 'next/font/google'
 import LayoutShell from '@/components/LayoutShell'
+import CookieConsent from '@/components/CookieConsent'
 import { LanguageProvider } from '@/lib/i18n/LanguageContext'
 import '@/styles/globals.css'
 
@@ -45,6 +46,7 @@ export default function RootLayout({
       <body className={`${interTight.variable} ${instrumentSans.variable} ${dancingScript.variable} ${notoSansKR.variable} antialiased`}>
         <LanguageProvider>
           <LayoutShell>{children}</LayoutShell>
+          <CookieConsent />
         </LanguageProvider>
       </body>
     </html>
