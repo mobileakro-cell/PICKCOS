@@ -62,15 +62,15 @@ const policies: Policy[] = [
     todo: ['민감 정보 게이팅 로직', '바이어 자격 확인 절차'],
   },
   {
-    no: '04', id: 'curation', title: '공급사 큐레이션·검증', status: '검토중',
-    issue: '"검증(Verified)"·"앰배서더 픽" 배지는 어떤 기준으로 부여하는가?',
+    no: '04', id: 'curation', title: '⭐ 추천·큐레이션 정책 (평가지표)', status: '잠정결론',
+    issue: '"추천"의 근거를 어떻게 제시하는가? 운영자 판단이 자의적이지 않도록 평가지표(rubric)가 필요하다. — 본 플랫폼의 핵심 신뢰 정책.',
     bestPractice: [
-      '사업자등록·인증서(ISO 22716/CGMP 등)·실사 기반 검증, 등급/뱃지 체계.',
-      '검증 증빙 보관 및 갱신 주기 관리.',
+      '리뷰(크라우드) 대신 전문가 큐레이션 + 근거 3층(① 객관 증빙 ② 큐레이터의 누가·왜 ③ 실적)으로 신뢰 형성.',
+      '추천은 가중치 있는 평가지표로 점수화 → 일관·방어 가능. 유료 노출이면 "Sponsored" 표시로 공정성 확보.',
     ],
-    current: 'verified·ambassadorPick 불리언만 존재하고, 부여 기준·증빙이 안 보임.',
-    decision: '리뷰(12) 대신 이 "검증 깊이"를 초기 신뢰의 핵심 메커니즘으로 삼는다(큐레이션 모델에 부합). 검증 배지 기준 공개, 인증서·서류 증빙 노출, 앰배서더 추천 사유, 동의 기반 큐레이션 성공사례를 갖춘다.',
-    todo: ['검증 기준·증빙 체크리스트 공개', '인증서/서류 증빙 노출', '앰배서더 추천 사유', '큐레이션 성공사례(오픈 리뷰 대체)'],
+    current: 'verified·ambassadorPick 불리언만 존재하고, 부여 기준·평가지표·증빙이 안 보임.',
+    decision: '리뷰(12) 대신 이 "추천·큐레이션"을 핵심 신뢰 메커니즘으로 삼는다. 아래 평가지표(7개 항목·가중치)로 공급사를 점수화하고, 그 근거(증빙·큐레이터 추천사유·실적)를 공급사 상세에 투명하게 노출한다. 지표·기준은 rubric으로 문서화해 일관성과 방어가능성을 확보한다.',
+    todo: ['평가지표(rubric) 확정·문서화', '공급사별 점수·근거 관리 필드', '공급사 상세에 근거 3층 노출', '유료 노출 시 Sponsored 표시'],
   },
   {
     no: '05', id: 'privacy', title: '개인정보·데이터 보호', status: '필수',
@@ -171,10 +171,25 @@ const policies: Policy[] = [
   },
 ]
 
+// 추천·큐레이션 평가지표 (rubric) — 정책 04의 핵심. 각 항목 0~5점 × 가중치 → 100점 환산.
+const curationScorecard: { dim: string; weight: number; detail: string }[] = [
+  { dim: '검증·신뢰', weight: 20, detail: '사업자등록·법인, 인증서(ISO 22716·CGMP), 실사 여부' },
+  { dim: '품질·규제', weight: 20, detail: 'QA/QC 체계, 타겟국 규제 대응, 클레임 이력' },
+  { dim: '생산 역량', weight: 15, detail: '설비·생산능력(CAPA), 제형/카테고리 전문성, R&D·처방' },
+  { dim: '실적·트랙레코드', weight: 15, detail: '업력, 수출 시장, 주요 납품 이력(동의)' },
+  { dim: '대응·커뮤니케이션', weight: 15, detail: '견적/문의 응답 속도, 영어·소통, 신뢰도' },
+  { dim: '유연성', weight: 10, detail: 'MOQ 유연성, 커스터마이징, 신규 브랜드 수용' },
+  { dim: '지속가능성·윤리', weight: 5, detail: '비건·친환경·크루얼티프리 등' },
+]
+
 // ── 변경 이력 (히스토리) — 단일 출처. 새 항목은 맨 위에 추가한다. ──
 // 정책을 조정할 때마다 여기에 한 줄 추가하면, 각 정책의 "최종 수정일"이 자동 반영된다.
 interface ChangeEntry { date: string; refs: string[]; summary: string }
 const changelog: ChangeEntry[] = [
+  {
+    date: '2026-07-05', refs: ['curation'],
+    summary: '추천·큐레이션을 핵심 정책으로 격상하고 평가지표(rubric, 7개 항목·가중치 100%) 확정 — 운영자 판단을 점수화해 일관·방어 가능하게, 근거 3층(증빙·누가·왜·실적)을 공급사 상세에 노출하기로.',
+  },
   {
     date: '2026-07-05', refs: ['reviews', 'curation'],
     summary: '리뷰·평점 보류 결정 — 큐레이션형 초기 단계엔 부적합(규모 부재·B2B 공개평가 회피·모델 상충). 신뢰는 리뷰 대신 "검증 깊이(04)"로 확보하기로: 검증 기준·증빙 노출, 앰배서더 추천 사유, 큐레이션 성공사례.',
@@ -300,6 +315,39 @@ export default function AdminPolicyPage() {
                     {p.todo.map((t, i) => <li key={i} className="flex gap-2"><span className="mt-0.5 text-[var(--color-theme-400)]">☐</span><span>{t}</span></li>)}
                   </ul>
                 </div>
+
+                {/* 추천·큐레이션 평가지표 (정책 04 전용) */}
+                {p.id === 'curation' && (
+                  <div className="mt-2 rounded-lg border-2 border-[var(--color-theme-200)] bg-[var(--color-theme-50)] p-4">
+                    <div className="mb-1 text-sm font-bold text-[var(--color-theme-700)]">추천 평가지표 (Curation Scorecard)</div>
+                    <p className="mb-3 text-xs text-gray-500">각 항목 0~5점 × 가중치 → 100점 환산. 임계 점수 이상 = "검증", 상위 = "앰배서더 픽". 근거(증빙·추천사유·실적)를 공급사 상세에 노출.</p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[13px]">
+                        <thead>
+                          <tr className="border-b border-[var(--color-theme-200)] text-left text-gray-500">
+                            <th className="py-1.5 pr-3">평가 항목</th>
+                            <th className="py-1.5 pr-3 whitespace-nowrap">가중치</th>
+                            <th className="py-1.5">세부 지표</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {curationScorecard.map((s) => (
+                            <tr key={s.dim} className="border-b border-[var(--color-theme-100)] align-top">
+                              <td className="py-1.5 pr-3 font-semibold text-gray-800 whitespace-nowrap">{s.dim}</td>
+                              <td className="py-1.5 pr-3 font-mono text-[var(--color-theme-700)]">{s.weight}%</td>
+                              <td className="py-1.5 text-gray-600">{s.detail}</td>
+                            </tr>
+                          ))}
+                          <tr className="font-bold text-gray-800">
+                            <td className="py-1.5 pr-3">합계</td>
+                            <td className="py-1.5 pr-3 font-mono">{curationScorecard.reduce((a, s) => a + s.weight, 0)}%</td>
+                            <td className="py-1.5" />
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
           ))}
