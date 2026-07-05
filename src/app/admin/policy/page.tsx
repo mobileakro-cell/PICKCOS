@@ -133,9 +133,9 @@ const policies: Policy[] = [
     no: '11', id: 'accessibility', title: '웹 접근성 (ADA/WCAG)', status: '검토중',
     issue: '북미 대상 사이트의 웹 접근성(ADA/WCAG)은 준수되는가?',
     bestPractice: ['WCAG 2.1 AA를 사실상 기준으로 시맨틱 마크업·대체텍스트·키보드 이동·색 대비·포커스 표시 준수. 미국은 ADA 접근성 소송이 연 수천 건(합의금 $5k~25k).'],
-    current: '기본 시맨틱/이미지 alt는 일부 적용되나 전면 점검·준수 여부는 미검증.',
-    decision: 'WCAG 2.1 AA 기준 점검을 수행하고 주요 위반을 수정한다. (신규 페이지·배너는 접근성 고려해 제작)',
-    todo: ['WCAG 2.1 AA 점검', 'alt·라벨·대비·키보드 이동 보정', '자동 검사 도구 도입'],
+    current: '1차 접근성 반영: 스킵 링크, 언어별 동적 html lang, main 랜드마크, 아이콘 버튼 aria-label. 전면 WCAG 2.1 AA 자동/수동 감사와 대비·포커스 보정은 진행 중.',
+    decision: '기본 접근성은 반영. WCAG 2.1 AA 자동 검사 도구로 전면 점검하고 잔여 위반을 수정한다.',
+    todo: ['✅ 스킵 링크·동적 lang·랜드마크·aria-label', 'WCAG 2.1 AA 자동 검사', '색 대비·포커스·키보드 이동 보정'],
   },
   {
     no: '12', id: 'reviews', title: '공급사 리뷰·평점', status: '검토중',
@@ -165,9 +165,9 @@ const policies: Policy[] = [
     no: '15', id: 'analytics-seo', title: '분석 · SEO', status: '검토중',
     issue: '유입·전환을 측정하고 검색 노출을 확보하는가?',
     bestPractice: ['웹 분석(전환 추적)·SEO 기본(메타/OG/sitemap/robots/구조화데이터)은 성장의 계기판.'],
-    current: '분석 도구 미도입, SEO 기본 태그·사이트맵 미비.',
-    decision: '개인정보/쿠키 동의(05)와 함께 프라이버시 준수 분석을 도입하고, SEO 기본을 갖춘다.',
-    todo: ['웹 분석 도입(동의 연계)', '메타/OG/sitemap/robots', '구조화 데이터'],
+    current: 'SEO 기본 구축: robots.txt·sitemap.xml(동적)·OpenGraph/Twitter 메타·Organization 구조화데이터. 분석: Vercel Analytics(쿠키리스) 도입. 상세 페이지별 메타(클라이언트 컴포넌트 제약)·추가 구조화데이터 확장은 남음.',
+    decision: 'SEO/분석 기본은 갖춤. 상세 페이지 메타(서버 컴포넌트화 또는 generateMetadata)와 제품/공급사 구조화데이터를 확장한다.',
+    todo: ['✅ robots·sitemap', '✅ OG/Twitter 메타·구조화데이터', '✅ Vercel Analytics(쿠키리스)', '상세 페이지별 메타', 'Product/Organization 구조화데이터 확장'],
   },
 ]
 
@@ -175,6 +175,10 @@ const policies: Policy[] = [
 // 정책을 조정할 때마다 여기에 한 줄 추가하면, 각 정책의 "최종 수정일"이 자동 반영된다.
 interface ChangeEntry { date: string; refs: string[]; summary: string }
 const changelog: ChangeEntry[] = [
+  {
+    date: '2026-07-05', refs: ['analytics-seo', 'accessibility'],
+    summary: 'SEO/분석·접근성 1차 구현 — robots·sitemap·OG/구조화데이터·Vercel Analytics(쿠키리스), 스킵 링크·동적 html lang·main 랜드마크·aria-label. 리뷰·바이어계정·RFQ는 순차 구축 예정.',
+  },
   {
     date: '2026-07-05', refs: ['privacy', 'legal', 'accessibility', 'reviews', 'buyer-account', 'rfq-quotes', 'analytics-seo'],
     summary: '북미 소싱 플랫폼 완성도 점검 반영 — 개인정보처리방침/이용약관 페이지·쿠키(CCPA)배너·수집 동의 체크 구현. 접근성·리뷰·바이어계정·RFQ 견적비교·분석/SEO를 신규 정책 항목(11~15)으로 추가(로드맵).',
