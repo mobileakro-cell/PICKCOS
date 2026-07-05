@@ -78,7 +78,7 @@ const steps = [
     title: '영문(EN) 자동 번역 — CSV로 한 번에',
     body: [
       '엑셀(CSV)에 한글(KO) 열만 채우고, 영문(EN) 열은 비워 둡니다. (번호·업체명 등 공통값은 그대로)',
-      '관리자 상단 [🌐 EN 번역 프롬프트] 버튼을 누르고, [프롬프트 복사]를 누릅니다.',
+"관리자 상단 [🤖 프롬프트 모음] 버튼을 누르고, 'EN 번역 프롬프트'의 [복사]를 누릅니다.",
       'Claude 채팅창에 그 프롬프트를 붙여넣고, 바로 아래에 KO를 채운 CSV를 붙여넣습니다.',
       'Claude가 영문(EN) 열이 채워진 CSV를 돌려줍니다. 그대로 복사해 둡니다.',
       '행이 아주 많으면(수백~수천) 200~500행씩 나눠서 여러 번 요청하면 됩니다.',
@@ -196,6 +196,49 @@ const faq = [
   ['한글/영문 둘 다 꼭 써야 하나요?', '가능하면 둘 다 권장하지만, 한쪽만 있어도 저장됩니다.'],
 ]
 
+// 공급사 정보 정리 — PC에서 준비 → 한 번에 업로드 (전체 프로세스)
+const supplierProcess: { step: string; where: string; title: string; body: string[] }[] = [
+  {
+    step: '1', where: 'PC · AI', title: 'CSV 초안 만들기',
+    body: [
+      '관리자 상단 [🤖 프롬프트 모음] → "공급사 작성 프롬프트" [복사].',
+      'Claude 등 AI에 붙여넣고, 맨 아래에 회사 웹사이트 주소나 회사소개를 넣습니다 → CSV를 받습니다.',
+      '업체가 여러 곳이면 반복해서 엑셀/스프레드시트에 행을 모읍니다.',
+      '맨 앞 [번호] 칸에 1, 2, 3… 을 매깁니다. (이미지 연결용 열쇠)',
+    ],
+  },
+  {
+    step: '2', where: 'PC', title: '검수하기',
+    body: [
+      'AI 초안이라 사실 확인이 필수입니다. 업체명·유형·MOQ·인증·설명이 맞는지 눈으로 확인합니다.',
+      '유형(패키징/원료/부자재)·제품군·MOQ·리드타임은 허용 값에 맞는지 봅니다.',
+    ],
+  },
+  {
+    step: '3', where: 'PC · AI', title: '영문(EN) 번역',
+    body: [
+      '한글(KO)만 채우고 영문(EN) 열은 비운 상태로 둡니다.',
+      '[🤖 프롬프트 모음] → "EN 번역 프롬프트" [복사] → AI에 붙이고, 그 아래에 CSV를 붙입니다.',
+      'EN 열이 채워진 CSV를 받습니다. (행이 많으면 200~500행씩 나눠서 요청)',
+    ],
+  },
+  {
+    step: '4', where: 'PC', title: '대표이미지 넘버링',
+    body: [
+      '각 업체 대표이미지를 파일명 = 그 업체 [번호]로 저장합니다. 예: 1.jpg, 2.png, 10.jpg',
+      '한 폴더에 모아둡니다. (이미지는 선택 — 없으면 건너뛰어도 됩니다)',
+    ],
+  },
+  {
+    step: '5', where: '관리자', title: '한 번에 업로드',
+    body: [
+      '[공급사] 탭 → 엑셀 일괄 등록 → 완성된 CSV 업로드 → "신규/수정" 미리보기 확인 → [반영].',
+      '[이미지] 탭 → 번호로 이미지 일괄 업로드 → 이미지 여러 장 선택 → [반영].',
+      '→ 번호를 기준으로 CSV와 이미지가 자동으로 연결됩니다. 끝.',
+    ],
+  },
+]
+
 export default function AdminManualPage() {
   return (
     <div className="min-h-screen bg-white text-gray-800">
@@ -216,6 +259,30 @@ export default function AdminManualPage() {
           <h1 className="text-3xl font-bold text-gray-900">PICKCOS 관리자 사용 설명서</h1>
           <p className="mt-2 text-gray-500">처음 쓰는 분도 따라 하기 쉽게 정리했습니다. 위 [PDF 다운로드]로 저장/인쇄할 수 있습니다.</p>
         </header>
+
+        {/* 공급사 정보 정리 — 전체 프로세스 (한눈에) */}
+        <section className="mb-12 rounded-2xl border-2 border-[var(--color-theme-200)] bg-[var(--color-theme-50)] p-6">
+          <div className="mb-1 inline-flex items-center gap-2 rounded-full bg-[var(--color-theme-600)] px-3 py-1 text-xs font-bold text-white">공급사 정보 정리 · 전체 프로세스</div>
+          <h2 className="mt-2 text-xl font-bold text-gray-900">PC에서 준비 → 한 번에 업로드</h2>
+          <p className="mt-1 text-[14px] text-gray-600">공급사 정보를 PC에서 CSV로 만들고(AI 활용) → 검수 → 번역 → 이미지 넘버링까지 마친 뒤, 관리자에 한 번에 올리는 순서입니다.</p>
+          <div className="mt-5 space-y-3">
+            {supplierProcess.map((s) => (
+              <div key={s.step} className="flex gap-4 rounded-lg border border-[var(--color-theme-100)] bg-white p-4">
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-theme-600)] text-sm font-bold text-white">{s.step}</div>
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="text-[15px] font-bold text-gray-900">{s.title}</h3>
+                    <span className="rounded-full bg-[var(--color-theme-50)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-theme-700)]">{s.where}</span>
+                  </div>
+                  <ul className="mt-1.5 list-disc space-y-1 pl-5 text-[14px] leading-relaxed text-gray-700 marker:text-gray-400">
+                    {s.body.map((line, i) => <li key={i}>{line}</li>)}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-[13px] text-gray-500">※ 각 단계의 자세한 설명은 아래 08(번역)·09(엑셀 일괄)·이미지 항목을 참고하세요.</p>
+        </section>
 
         <div className="space-y-8">
           {steps.map((s) => (
