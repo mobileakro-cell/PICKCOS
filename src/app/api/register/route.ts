@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { listAll, insertOne } from '@/lib/db'
 import { getAdmin } from '@/lib/auth'
+import { sendOperatorNotification } from '@/lib/notify'
 
 interface MemberSignup {
   id: string
@@ -24,6 +25,15 @@ export async function POST(request: NextRequest) {
 
     const id = `MEM-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
     await insertOne('member', { company, name, email, role, country, interest, createdAt: new Date().toISOString() }, id)
+
+    await sendOperatorNotification('새 회원 가입', [
+      `회원번호: ${id}`,
+      `회사: ${company}`,
+      `이름: ${name}${role ? ` (${role})` : ''}`,
+      `이메일: ${email}`,
+      country ? `국가: ${country}` : '',
+      interest ? `관심 분야: ${interest}` : '',
+    ])
 
     return NextResponse.json({ memberId: id }, { status: 201 })
   } catch (error) {

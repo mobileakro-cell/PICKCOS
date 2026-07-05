@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { listAll, insertOne, patchOne } from '@/lib/db'
 import { getAdmin } from '@/lib/auth'
+import { sendOperatorNotification } from '@/lib/notify'
 
 interface InquiryPayload {
   inquiryType: string
@@ -34,6 +35,17 @@ export async function POST(request: NextRequest) {
 
     const ticketId = generateTicketId()
     await insertOne('inquiry', { ...body, status: 'new', createdAt: new Date().toISOString() }, ticketId)
+
+    await sendOperatorNotification('새 문의 접수', [
+      `접수번호: ${ticketId}`,
+      `유형: ${body.inquiryType}`,
+      `카테고리: ${body.category}`,
+      `타겟 시장: ${(body.targetMarkets || []).join(', ')}`,
+      body.supplierId ? `관련 공급사: ${body.supplierId}` : '',
+      '',
+      `내용:`,
+      body.description || '',
+    ])
 
     return NextResponse.json({ ticketId }, { status: 201 })
   } catch (error) {

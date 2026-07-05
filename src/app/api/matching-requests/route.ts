@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { listAll, insertOne, patchOne } from '@/lib/db'
 import { getAdmin } from '@/lib/auth'
+import { sendOperatorNotification } from '@/lib/notify'
 
 interface MatchingRequest {
   id: string
@@ -118,6 +119,22 @@ export async function POST(request: NextRequest) {
     }
 
     await insertOne('matchingRequest', newRequest, requestId)
+
+    await sendOperatorNotification('새 매칭 신청 접수', [
+      `접수번호: ${requestId}`,
+      `회사: ${companyName} (${country})`,
+      `담당자: ${personName} · ${email}`,
+      website ? `웹사이트: ${website}` : '',
+      `요청 유형: ${requestType} / 사업단계: ${businessStage}`,
+      `카테고리: ${category} / 서비스범위: ${serviceScope}`,
+      `예상 수량(MOQ): ${expectedMoq}${packagingFormat ? ` / 패키징: ${packagingFormat}` : ''}`,
+      `선호 연락: ${preferredChannel}`,
+      supplierId ? `관련 공급사: ${supplierId}` : '',
+      '',
+      `요청 브리프:`,
+      requestBrief || '',
+      referenceProduct ? `참고 제품: ${referenceProduct}` : '',
+    ])
 
     return NextResponse.json(
       { requestId },
