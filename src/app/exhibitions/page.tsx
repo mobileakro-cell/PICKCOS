@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
@@ -33,6 +33,16 @@ interface Exhibition {
 }
 
 export default function ExhibitionsPage() {
+  // useSearchParams must sit inside a Suspense boundary, otherwise Next deopts the
+  // whole route to client-side rendering at build time.
+  return (
+    <Suspense fallback={null}>
+      <ExhibitionsContent />
+    </Suspense>
+  )
+}
+
+function ExhibitionsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { lang, t } = useLanguage()
