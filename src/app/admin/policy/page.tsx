@@ -131,6 +131,28 @@ const policies: Policy[] = [
   },
 ]
 
+// ── 변경 이력 (히스토리) — 단일 출처. 새 항목은 맨 위에 추가한다. ──
+// 정책을 조정할 때마다 여기에 한 줄 추가하면, 각 정책의 "최종 수정일"이 자동 반영된다.
+interface ChangeEntry { date: string; refs: string[]; summary: string }
+const changelog: ChangeEntry[] = [
+  {
+    date: '2026-07-05', refs: ['inquiry-routing'],
+    summary: "베타 논의 반영 — '관리자 경유 중개(A안)'을 잠정결론으로, 첫 단계로 '문의 접수 시 관리자 알림 메일' 우선 도입 방향 설정.",
+  },
+  {
+    date: '2026-07-05',
+    refs: ['inquiry-routing', 'disintermediation', 'gating', 'curation', 'privacy', 'content', 'media', 'anti-abuse', 'monetization', 'legal'],
+    summary: '서비스 정책 문서 최초 작성 — 정책 10개 초안 및 목차 구성.',
+  },
+]
+
+// 특정 정책의 최종 수정일 (변경 이력에서 도출)
+function lastUpdated(id: string): string | null {
+  const dates = changelog.filter((c) => c.refs.includes(id)).map((c) => c.date).sort()
+  return dates.length ? dates[dates.length - 1] : null
+}
+const policyTitle = (id: string) => policies.find((p) => p.id === id)?.title || id
+
 const statusStyle: Record<Status, string> = {
   '필수': 'bg-red-100 text-red-700',
   '검토중': 'bg-yellow-100 text-yellow-700',
@@ -178,6 +200,10 @@ export default function AdminPolicyPage() {
               </li>
             ))}
           </ol>
+          <a href="#history" className="mt-2 flex items-center gap-2 rounded-md px-2 py-1.5 text-[14px] font-medium text-gray-700 hover:bg-white hover:text-[var(--color-theme-700)]">
+            <span className="font-mono text-xs text-gray-400">🕘</span>
+            <span className="flex-1">변경 이력 (History)</span>
+          </a>
         </nav>
 
         {/* 정책 본문 */}
@@ -186,7 +212,10 @@ export default function AdminPolicyPage() {
             <section key={p.id} id={p.id} className="scroll-mt-20 rounded-xl border p-6">
               <div className="mb-3 flex items-center gap-3">
                 <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-theme-50)] text-sm font-bold text-[var(--color-theme-700)]">{p.no}</span>
-                <h2 className="flex-1 text-xl font-bold text-gray-900">{p.title}</h2>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-gray-900">{p.title}</h2>
+                  {lastUpdated(p.id) && <div className="text-xs text-gray-400">최종 수정 {lastUpdated(p.id)}</div>}
+                </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusStyle[p.status]}`}>{p.status}</span>
               </div>
 
@@ -219,6 +248,30 @@ export default function AdminPolicyPage() {
             </section>
           ))}
         </div>
+
+        {/* 변경 이력 */}
+        <section id="history" className="mt-12 scroll-mt-20 rounded-xl border p-6">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-lg">🕘</span>
+            <h2 className="text-xl font-bold text-gray-900">변경 이력 (History)</h2>
+          </div>
+          <p className="mb-4 text-[14px] text-gray-500">정책을 조정할 때마다 한 줄씩 기록합니다. 각 정책의 "최종 수정일"은 이 이력에서 자동 반영됩니다. (최신순)</p>
+          <ol className="space-y-3">
+            {changelog.map((c, i) => (
+              <li key={i} className="flex gap-3 border-l-2 border-[var(--color-theme-200)] pl-4">
+                <div className="w-24 flex-shrink-0 font-mono text-[13px] text-gray-400">{c.date}</div>
+                <div className="flex-1">
+                  <div className="mb-1 flex flex-wrap gap-1">
+                    {c.refs.map((r) => (
+                      <a key={r} href={`#${r}`} className="rounded-full bg-[var(--color-theme-50)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-theme-700)] hover:underline">{policyTitle(r)}</a>
+                    ))}
+                  </div>
+                  <p className="text-[14px] text-gray-700">{c.summary}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
         <footer className="mt-12 border-t pt-6 text-center text-xs text-gray-400">
           정책 조정이 필요하면 담당자에게 요청하세요. 항목 간 불일치·중복은 정기적으로 점검해 갱신합니다.
