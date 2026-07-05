@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { formatMoq, formatLeadTime } from '@/lib/options'
+import { CURATION_DIMENSIONS, computeCurationTotal, curationBadge } from '@/lib/curation'
 
 interface BilingualText {
   ko: string
@@ -53,6 +54,13 @@ interface Supplier {
   contact: string
   website: string
   files: SupplierFile[]
+  curation?: {
+    scores?: Record<string, number>
+    recommendation?: string
+    curator?: string
+    sponsored?: boolean
+    total?: number
+  }
 }
 
 export default function SupplierDetailPage({ params }: { params: { id: string } }) {
@@ -181,6 +189,68 @@ export default function SupplierDetailPage({ params }: { params: { id: string } 
           </div>
         </div>
       </div>
+
+      {/* 검증·큐레이션 근거 */}
+      {(() => {
+        const cur = supplier.curation
+        const hasScores = cur?.scores && Object.keys(cur.scores).length > 0
+        if (!hasScores && !cur?.recommendation) return null
+        const total = cur?.total ?? computeCurationTotal(cur?.scores)
+        const badge = curationBadge(total)
+        return (
+          <div className="max-w-5xl mx-auto px-6 mt-10">
+            <div className="rounded-2xl border border-border bg-soft-gray/40 p-6 md:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-mocha-gray">
+                  {lang === 'ko' ? '검증 · 큐레이션 근거' : 'Verification & Curation'}
+                </h3>
+                {cur?.sponsored && (
+                  <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-[10px] font-semibold uppercase tracking-wider rounded-pill">Sponsored</span>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 items-start">
+                {/* 종합 점수 */}
+                <div className="text-center md:pr-8 md:border-r border-border">
+                  <div className="text-5xl font-bold text-charcoal leading-none">{total}<span className="text-lg text-mocha-gray font-medium"> / 100</span></div>
+                  <div className="mt-2">
+                    {badge === 'pick' ? (
+                      <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-[10px] font-semibold uppercase tracking-wider rounded-pill">Ambassador Pick</span>
+                    ) : badge === 'verified' ? (
+                      <span className="px-2.5 py-1 bg-charcoal text-ivory text-[10px] font-semibold uppercase tracking-wider rounded-pill">Verified</span>
+                    ) : null}
+                  </div>
+                  <p className="mt-2 text-[11px] text-mocha-gray">{lang === 'ko' ? '평가지표 종합' : 'Curation score'}</p>
+                </div>
+                {/* 항목별 점수 */}
+                {hasScores && (
+                  <div className="space-y-2.5">
+                    {CURATION_DIMENSIONS.map(d => {
+                      const s = Number(cur?.scores?.[d.key]) || 0
+                      return (
+                        <div key={d.key} className="flex items-center gap-3">
+                          <span className="w-32 flex-shrink-0 text-xs text-mocha-gray">{lang === 'ko' ? d.ko : d.en}</span>
+                          <div className="flex-1 h-2 rounded-full bg-white overflow-hidden">
+                            <div className="h-full bg-charcoal" style={{ width: `${(s / 5) * 100}%` }} />
+                          </div>
+                          <span className="w-8 text-right text-xs font-medium text-charcoal">{s}/5</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+              {/* 큐레이터 추천 사유 */}
+              {cur?.recommendation && (
+                <div className="mt-6 pt-6 border-t border-border">
+                  <p className="text-[11px] uppercase tracking-widest text-mocha-gray font-medium mb-2">{lang === 'ko' ? '큐레이터 추천 사유' : "Curator's Note"}</p>
+                  <p className="text-charcoal leading-relaxed">&ldquo;{cur.recommendation}&rdquo;</p>
+                  {cur?.curator && <p className="mt-2 text-sm text-mocha-gray">— {cur.curator}</p>}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Tab Navigation */}
       <div className="sticky top-0 z-30 bg-white border-b border-border">

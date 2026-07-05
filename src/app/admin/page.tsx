@@ -6,6 +6,7 @@ import type { Supplier, Article, Exhibition, BL, BLArray } from '@/lib/types'
 import { bl, blArr, SUPPLIER_TYPES, PRODUCT_CATEGORIES } from '@/lib/types'
 import { parseCSV, toCSV, SUPPLIER_HEADERS, supplierToRow, rowToSupplier, EXHIBITION_HEADERS, exhibitionToRow, rowToExhibition } from '@/lib/csv'
 import { COUNTRY_OPTIONS, MOQ_RANGE_OPTIONS, LEADTIME_RANGE_OPTIONS, CERTIFICATION_OPTIONS, EXPORT_MARKET_OPTIONS } from '@/lib/options'
+import { CURATION_DIMENSIONS, computeCurationTotal, curationBadge, CURATION_VERIFIED_THRESHOLD } from '@/lib/curation'
 
 // Trigger a CSV file download (BOM prefix so Excel reads Korean correctly)
 function downloadCSV(filename: string, text: string) {
@@ -1412,6 +1413,66 @@ export default function AdminPage() {
                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={editingSupplier.featured} onChange={e => setEditingSupplier({ ...editingSupplier, featured: e.target.checked })} /> 추천</label>
                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={editingSupplier.verified} onChange={e => setEditingSupplier({ ...editingSupplier, verified: e.target.checked })} /> 검증</label>
                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={editingSupplier.ambassadorPick} onChange={e => setEditingSupplier({ ...editingSupplier, ambassadorPick: e.target.checked })} /> 앰버서더 픽</label>
+              </div>
+
+              {/* ── 추천·큐레이션 평가지표 (정책 04) ── */}
+              <div className="md:col-span-2 mt-4 mb-1 flex items-baseline justify-between">
+                <span className="text-sm font-semibold text-gray-500">추천·큐레이션 평가지표</span>
+                <span className="text-xs text-gray-400">각 항목 0~5점 · 자동 100점 환산</span>
+              </div>
+              <div className="md:col-span-2 rounded-lg border-2 border-[var(--color-theme-100)] bg-[var(--color-theme-50)]/50 p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  {CURATION_DIMENSIONS.map(d => (
+                    <div key={d.key} className="flex items-center justify-between gap-2">
+                      <span className="text-sm text-gray-700">{d.ko} <span className="text-gray-400 text-xs">({d.weight}%)</span></span>
+                      <input
+                        type="number" min={0} max={5} step={1}
+                        value={editingSupplier.curation?.scores?.[d.key] ?? ''}
+                        onChange={e => {
+                          const raw = e.target.value
+                          const v = raw === '' ? 0 : Math.max(0, Math.min(5, Number(raw)))
+                          const scores = { ...(editingSupplier.curation?.scores || {}), [d.key]: v }
+                          setEditingSupplier({ ...editingSupplier, curation: { ...(editingSupplier.curation || {}), scores, total: computeCurationTotal(scores) } })
+                        }}
+                        className="w-16 border rounded px-2 py-1 text-sm text-right focus:outline-none focus:border-primary"
+                      />
+                    </div>
+                  ))}
+                </div>
+                {(() => {
+                  const total = computeCurationTotal(editingSupplier.curation?.scores)
+                  const badge = curationBadge(total)
+                  return (
+                    <div className="mt-3 flex items-center gap-3 border-t border-[var(--color-theme-100)] pt-3">
+                      <span className="text-sm font-semibold text-gray-700">종합 <span className="text-lg text-[var(--color-theme-700)]">{total}</span> / 100</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge === 'pick' ? 'bg-yellow-100 text-yellow-700' : badge === 'verified' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {badge === 'pick' ? '앰배서더 픽 제안' : badge === 'verified' ? '검증 제안' : `미달 (검증 ${CURATION_VERIFIED_THRESHOLD}점↑)`}
+                      </span>
+                      <span className="text-xs text-gray-400">※ 배지는 위 체크박스로 최종 확정</span>
+                    </div>
+                  )
+                })()}
+                <div className="mt-3 space-y-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">큐레이터 추천 사유 (왜)</label>
+                    <textarea
+                      rows={2}
+                      value={editingSupplier.curation?.recommendation || ''}
+                      onChange={e => setEditingSupplier({ ...editingSupplier, curation: { ...(editingSupplier.curation || {}), recommendation: e.target.value } })}
+                      placeholder="예: 저MOQ 비건 포뮬러에 강함, QA 대응 빠름"
+                      className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-gray-600 mb-1">큐레이터/앰배서더 (누가)</label>
+                      <input type="text" value={editingSupplier.curation?.curator || ''} onChange={e => setEditingSupplier({ ...editingSupplier, curation: { ...(editingSupplier.curation || {}), curator: e.target.value } })} className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:border-primary" placeholder="예: Sarah Chen" />
+                    </div>
+                    <label className="flex items-center gap-2 text-sm self-end pb-2">
+                      <input type="checkbox" checked={!!editingSupplier.curation?.sponsored} onChange={e => setEditingSupplier({ ...editingSupplier, curation: { ...(editingSupplier.curation || {}), sponsored: e.target.checked } })} /> 유료 노출(Sponsored)
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-8 pt-6 border-t">
