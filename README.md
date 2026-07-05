@@ -188,7 +188,7 @@ Write methods (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid admin session cook
 
 ```bash
 # Navigate to the project directory
-cd MYNEWSITE
+cd pickcos-app
 
 # Install dependencies (postinstall runs `prisma generate`)
 npm install
