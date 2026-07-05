@@ -68,7 +68,7 @@ interface MemberSignup {
   createdAt: string
 }
 
-type TabType = 'inquiries' | 'matching' | 'members' | 'suppliers' | 'articles' | 'exhibitions' | 'settings'
+type TabType = 'inquiries' | 'matching' | 'members' | 'suppliers' | 'images' | 'articles' | 'exhibitions' | 'settings'
 
 // --------------- Bilingual helpers ---------------
 const emptyBL: BL = { en: '', ko: '' }
@@ -203,6 +203,148 @@ function ImageUpload({ keyBase, onUploaded }: { keyBase: string; onUploaded: (ur
         {uploading ? '업로드 중…' : '📁 파일 업로드'}
       </button>
     </>
+  )
+}
+
+// 파일명 앞의 숫자를 공급사 번호로 추출 (예: "1.jpg"→"1", "3_front.png"→"3", "sup-12.jpg"→"12")
+function extractSupplierNumber(filename: string): string | null {
+  const base = filename.replace(/\.[^.]+$/, '')
+  const m = base.match(/\d+/)
+  return m ? m[0] : null
+}
+
+// 공급사 이미지 관리: ① 번호 자동매칭 일괄 업로드 ② 갤러리(확인·교체·삭제)
+function SupplierImageManager({ suppliers, onChanged }: { suppliers: any[]; onChanged: () => Promise<void> | void }) {
+  const [preview, setPreview] = useState<null | { file: File; num: string | null; supplier: any | null }[]>(null)
+  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState('')
+  const bulkRef = useRef<HTMLInputElement>(null)
+
+  const findSupplier = (num: string | null) => (num ? suppliers.find((s) => String(s.id) === num) || null : null)
+
+  const onPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (!files.length) return
+    setPreview(files.map((f) => {
+      const num = extractSupplierNumber(f.name)
+      return { file: f, num, supplier: findSupplier(num) }
+    }))
+    if (bulkRef.current) bulkRef.current.value = ''
+  }
+
+  const saveImage = async (id: string, url: string) => {
+    const res = await fetch('/api/suppliers', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, image: url }),
+    })
+    return res.ok
+  }
+
+  const applyBulk = async () => {
+    if (!preview) return
+    const matched = preview.filter((p) => p.supplier)
+    if (!matched.length) { alert('매칭된 이미지가 없습니다. 파일명 앞에 공급사 번호를 붙였는지 확인하세요.'); return }
+    setBusy(true)
+    let ok = 0, fail = 0
+    for (let i = 0; i < matched.length; i++) {
+      const p = matched[i]
+      setProgress(`${i + 1}/${matched.length} 처리 중…`)
+      try {
+        const fd = new FormData()
+        fd.append('file', p.file)
+        fd.append('key', `sup-${p.supplier.id}`)
+        const res = await fetch('/api/upload', { method: 'POST', body: fd })
+        const d = await res.json().catch(() => ({}))
+        if (res.ok && d.url && (await saveImage(String(p.supplier.id), d.url))) ok++
+        else fail++
+      } catch { fail++ }
+    }
+    setBusy(false); setProgress(''); setPreview(null)
+    await onChanged()
+    alert(`이미지 반영 완료 — 성공 ${ok}건${fail ? `, 실패 ${fail}건` : ''}`)
+  }
+
+  const removeImage = async (s: any) => {
+    if (!confirm(`[${s.id}] ${s.name || ''} 의 이미지를 삭제할까요?`)) return
+    if (await saveImage(String(s.id), '')) await onChanged()
+    else alert('삭제에 실패했습니다.')
+  }
+
+  const matchedCount = preview?.filter((p) => p.supplier).length ?? 0
+  const withImage = suppliers.filter((s) => s.image).length
+
+  return (
+    <div>
+      {/* ── 일괄 업로드 ── */}
+      <div className="mb-8 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 p-5">
+        <h3 className="text-lg font-bold text-gray-900">번호로 이미지 일괄 업로드</h3>
+        <p className="mt-1 text-sm text-gray-600">
+          PC에서 이미지 파일명을 <b>공급사 번호</b>로 저장하세요. (예: <code>1.jpg</code>, <code>2.png</code>, <code>10.jpg</code>)
+          여러 장을 한 번에 선택하면 번호가 같은 공급사에 자동 연결됩니다.
+        </p>
+        <input ref={bulkRef} type="file" accept="image/*" multiple onChange={onPick} className="hidden" />
+        <button type="button" onClick={() => bulkRef.current?.click()} disabled={busy} className="mt-3 px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50">
+          📁 이미지 여러 장 선택
+        </button>
+
+        {preview && (
+          <div className="mt-4 rounded-lg border bg-white p-4">
+            <div className="mb-2 flex items-center gap-3 text-sm">
+              <span className="font-semibold text-green-700">매칭 {matchedCount}건</span>
+              <span className="text-gray-400">/</span>
+              <span className="font-semibold text-red-600">실패 {preview.length - matchedCount}건</span>
+              <span className="text-gray-400">(총 {preview.length}장)</span>
+            </div>
+            <div className="max-h-56 overflow-y-auto rounded border">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-gray-500"><tr><th className="px-3 py-2 text-left">파일</th><th className="px-3 py-2 text-left">번호</th><th className="px-3 py-2 text-left">연결될 공급사</th></tr></thead>
+                <tbody>
+                  {preview.map((p, i) => (
+                    <tr key={i} className="border-t">
+                      <td className="px-3 py-1.5">{p.file.name}</td>
+                      <td className="px-3 py-1.5">{p.num || '—'}</td>
+                      <td className="px-3 py-1.5">{p.supplier ? <span className="text-green-700">{p.supplier.name || '(이름없음)'}</span> : <span className="text-red-600">매칭 실패 (번호 없음)</span>}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-3 flex items-center gap-3">
+              <button type="button" onClick={applyBulk} disabled={busy || matchedCount === 0} className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50">
+                {busy ? (progress || '반영 중…') : `${matchedCount}건 반영`}
+              </button>
+              <button type="button" onClick={() => setPreview(null)} disabled={busy} className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50">취소</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── 갤러리 ── */}
+      <div className="mb-4 flex items-baseline justify-between">
+        <h3 className="text-lg font-bold text-gray-900">이미지 갤러리</h3>
+        <span className="text-sm text-gray-500">이미지 있음 {withImage} / 전체 {suppliers.length} · 누락 {suppliers.length - withImage}</span>
+      </div>
+      {suppliers.length === 0 ? (
+        <p className="py-10 text-center text-gray-400">등록된 공급사가 없습니다.</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {suppliers.map((s) => (
+            <div key={s.id} className={`rounded-lg border p-2 ${s.image ? 'bg-white' : 'border-red-200 bg-red-50'}`}>
+              <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded bg-gray-100">
+                {s.image
+                  ? <img src={s.image} alt={s.name || ''} className="h-full w-full object-cover" />
+                  : <span className="text-xs font-medium text-red-400">이미지 없음</span>}
+                <span className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[11px] font-bold text-white">#{s.id}</span>
+              </div>
+              <div className="mt-1.5 truncate text-sm font-medium text-gray-800" title={s.name}>{s.name || '(이름없음)'}</div>
+              <div className="mt-1 flex items-center gap-1.5">
+                <ImageUpload keyBase={`sup-${s.id}`} onUploaded={async (url) => { if (await saveImage(String(s.id), url)) await onChanged() }} />
+                {s.image && <button type="button" onClick={() => removeImage(s)} className="mt-2 px-2 py-2 text-sm text-red-600 hover:underline">삭제</button>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -716,7 +858,7 @@ export default function AdminPage() {
         {/* Tab Navigation */}
         <div className="bg-white rounded-lg shadow mb-8">
           <div className="flex border-b overflow-x-auto">
-            {(['inquiries', 'matching', 'members', 'suppliers', 'articles', 'exhibitions', ...(isSuper ? ['settings'] : [])] as TabType[]).map(tab => (
+            {(['inquiries', 'matching', 'members', 'suppliers', 'images', 'articles', 'exhibitions', ...(isSuper ? ['settings'] : [])] as TabType[]).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -728,6 +870,7 @@ export default function AdminPage() {
                   : tab === 'matching' ? `매칭 (${stats.totalMatching})`
                   : tab === 'members' ? `회원 (${members.length})`
                   : tab === 'suppliers' ? `공급사 (${suppliers.length})`
+                  : tab === 'images' ? '이미지'
                   : tab === 'articles' ? `기사 (${articles.length})`
                   : tab === 'exhibitions' ? `전시 (${exhibitions.length})`
                   : '설정'}
@@ -934,6 +1077,14 @@ export default function AdminPage() {
                   ))}
                   {suppliers.length === 0 && <p className="text-gray-500 text-center py-8">등록된 공급사가 없습니다.</p>}
                 </div>
+              </div>
+            )}
+
+            {/* =================== Images Tab =================== */}
+            {activeTab === 'images' && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">공급사 이미지 관리</h2>
+                <SupplierImageManager suppliers={suppliers} onChanged={fetchSuppliers} />
               </div>
             )}
 
