@@ -111,6 +111,69 @@ const upcoming = [
   '자동 백업 & 복원 — 잘못 올려도 이전 버전으로 되돌리기 (경고창 포함)',
 ]
 
+// 현재는 CBT(비공개 테스트) 단계입니다. 정식(양산) 런칭 전에 아래를 점검하세요.
+// [운영자] = 관리자 화면/계정에서 직접 / [개발자] = 코드·인프라 작업 필요
+const launch = [
+  {
+    cat: '1. 인프라 · 요금제 점검',
+    who: '개발자 · 운영자',
+    items: [
+      'Supabase(데이터베이스): 무료 플랜은 7일간 접속이 없으면 DB가 자동 정지되어, 그동안 회원가입·문의 저장이 실패합니다. 상시 운영하려면 유료(Pro, 약 $25/월) 업그레이드를 검토하세요. (자동 백업·동시접속 한도도 함께 늘어남)',
+      'Vercel(호스팅): 현재 Hobby(개인·비상업용) 플랜입니다. 실제 상업 서비스로 운영하려면 Pro 플랜이 필요할 수 있습니다. (함수 실행시간 10초·월 대역폭 100GB 제한도 완화됨)',
+      '대용량 엑셀 일괄 등록이 잦다면, Hobby의 10초 함수 제한에 걸리지 않는지 확인하세요.',
+    ],
+  },
+  {
+    cat: '2. 도메인 · 브랜딩',
+    who: '개발자',
+    items: [
+      '지금은 임시 주소(pickcos-mynewsite.vercel.app)입니다. 자체 도메인(예: pickcos.com)을 구입해 Vercel에 연결하세요. (Vercel → Settings → Domains, DNS 설정)',
+      '연결 후 도메인이 대표 주소가 되도록 지정하고, https(보안 자물쇠)가 자동 적용됐는지 확인합니다.',
+    ],
+  },
+  {
+    cat: '3. 보안',
+    who: '개발자 · 운영자',
+    items: [
+      '관리자 비밀번호(ADMIN_PW)를 추측하기 어려운 강력한 값으로 변경하세요. /admin 주소는 공개되어 있어 비밀번호만이 방어선입니다.',
+      '세션 서명키(SESSION_SECRET)가 길고 무작위한 값인지 확인합니다. (기본값·짧은 값이면 교체)',
+      'Supabase 서비스 키(SERVICE_ROLE_KEY)는 절대 외부에 노출하지 마세요. 채팅·화면공유·공개 저장소 금지.',
+      '환경변수는 서버에만 저장되어야 합니다. .env 파일을 Git에 올리지 않았는지 확인하세요.',
+    ],
+  },
+  {
+    cat: '4. 실데이터 준비',
+    who: '운영자',
+    items: [
+      '관리자 오른쪽 위 [샘플 데이터 삭제]로 데모 데이터를 정리합니다. (실제 입력분은 지워지지 않음)',
+      '실제 공급사·기사·전시 데이터를 입력합니다. (엑셀 일괄 등록 활용 — 09번 참고)',
+      '한글(KO)·영문(EN) 콘텐츠가 모두 채워졌는지 확인합니다. (EN 자동번역 — 08번 참고)',
+      '회원·문의 데이터의 정기 백업 방법을 정해 둡니다. (유료 플랜은 자동 백업 지원)',
+    ],
+  },
+  {
+    cat: '5. 기능 · 정책 최종 점검',
+    who: '개발자 · 운영자',
+    items: [
+      '문의·매칭 신청 폼: 현재 "마감" 상태입니다. 정식 오픈 시 다시 받으려면 개발자가 코드에서 마감 해제 후 재배포해야 합니다.',
+      '실제 회원가입·문의·관리자 등록/수정/삭제를 한 번씩 테스트해 저장이 되는지 확인합니다.',
+      '개인정보처리방침·이용약관 페이지가 필요합니다. 회원가입·문의로 개인정보(이름·이메일 등)를 수집하므로 상용 서비스는 법적으로 필수입니다.',
+      '회원가입/문의 폼에 개인정보 수집·이용 동의 체크를 넣습니다. (필요 시 개발자 작업)',
+      '사업자 정보·연락처 표기(전자상거래 관련) 필요 여부를 확인합니다.',
+    ],
+  },
+  {
+    cat: '6. 배포 · 운영 체계',
+    who: '개발자',
+    items: [
+      'Git 자동 배포 연결을 확인합니다. (코드 수정 후 push하면 자동 반영되도록 — Vercel → Settings → Git)',
+      '미리보기(Preview) 환경도 쓸 경우, 환경변수를 Preview에도 추가합니다. (현재는 Production에만 등록됨)',
+      '접속 통계·오류 모니터링 도입을 검토합니다. (예: Vercel Analytics, 오류 추적 도구)',
+      'SEO 기본 세팅을 점검합니다. (검색엔진 노출용 메타태그·OG 이미지·sitemap 등)',
+    ],
+  },
+]
+
 const faq = [
   ['이미지는 꼭 넣어야 하나요?', '아니요. 비워도 저장됩니다. 있으면 URL을 붙여넣으세요.'],
   ['잘못 저장했어요.', '목록에서 [수정]으로 고치거나 [삭제]로 지우면 됩니다. (곧 백업/복원 기능도 추가됩니다)'],
@@ -154,6 +217,36 @@ export default function AdminManualPage() {
             </section>
           ))}
         </div>
+
+        {/* 정식(양산) 런칭 준비 체크리스트 */}
+        <section className="mt-12 rounded-xl border-2 border-[var(--color-theme-200)] bg-[var(--color-theme-50)] p-6">
+          <div className="mb-1 inline-flex items-center gap-2 rounded-full bg-[var(--color-theme-600)] px-3 py-1 text-xs font-bold text-white">CBT → 정식 런칭</div>
+          <h2 className="mt-2 text-xl font-bold text-gray-900">정식(양산) 런칭 준비 체크리스트</h2>
+          <p className="mt-1 text-[14px] text-gray-600">
+            현재는 <b>CBT(비공개 테스트)</b> 단계입니다. 정식 오픈 전에 아래 항목을 점검하세요.
+            <span className="ml-1 rounded bg-white px-1.5 py-0.5 text-[12px] text-gray-500">운영자 = 관리자 화면에서 직접</span>
+            <span className="ml-1 rounded bg-white px-1.5 py-0.5 text-[12px] text-gray-500">개발자 = 코드·인프라 작업 필요</span>
+          </p>
+          <div className="mt-5 space-y-5">
+            {launch.map((g) => (
+              <div key={g.cat} className="rounded-lg border border-[var(--color-theme-100)] bg-white p-4">
+                <div className="mb-2 flex items-baseline justify-between gap-2">
+                  <h3 className="text-[15px] font-bold text-gray-900">{g.cat}</h3>
+                  <span className="flex-shrink-0 rounded-full bg-[var(--color-theme-50)] px-2 py-0.5 text-[12px] font-semibold text-[var(--color-theme-700)]">{g.who}</span>
+                </div>
+                <ul className="space-y-1.5 text-[14px] leading-relaxed text-gray-700">
+                  {g.items.map((it, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="mt-0.5 flex-shrink-0 text-[var(--color-theme-400)]">☐</span>
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-[13px] text-gray-500">※ 개발자 작업(코드·요금제·도메인·보안)은 담당 개발자에게 이 체크리스트를 전달하세요.</p>
+        </section>
 
         {/* Upcoming */}
         <section className="mt-10 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
