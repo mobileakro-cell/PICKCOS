@@ -43,15 +43,18 @@ interface InquiryRequest {
 interface MatchingRequest {
   id: string
   requestType: string
+  businessStage?: string
   category: string
-  conceptKeywords: string
-  targetMarkets: string[]
-  moqTarget?: string
+  requestBrief: string
+  serviceScope?: string
+  targetMarkets?: string[]
+  expectedMoq?: string
   timeline?: string
   companyName: string
   personName: string
   email: string
   country: string
+  website?: string
   supplierId?: string
   createdAt: string
   status: 'new' | 'in_progress' | 'matched' | 'closed'
@@ -948,8 +951,8 @@ export default function AdminPage() {
                         <th className="px-4 py-3 text-left">회사</th>
                         <th className="px-4 py-3 text-left">담당자</th>
                         <th className="px-4 py-3 text-left">카테고리</th>
-                        <th className="px-4 py-3 text-left">컨셉/키워드</th>
-                        <th className="px-4 py-3 text-left">MOQ</th>
+                        <th className="px-4 py-3 text-left">요청 브리프</th>
+                        <th className="px-4 py-3 text-left">예상 MOQ</th>
                         <th className="px-4 py-3 text-left">날짜</th>
                         <th className="px-4 py-3 text-left">상태</th>
                       </tr>
@@ -972,8 +975,8 @@ export default function AdminPage() {
                             </div>
                           </td>
                           <td className="px-4 py-3">{req.category}</td>
-                          <td className="px-4 py-3 max-w-xs"><div className="line-clamp-2 text-gray-600" title={req.conceptKeywords}>{req.conceptKeywords}</div></td>
-                          <td className="px-4 py-3 whitespace-nowrap">{req.moqTarget || '-'}</td>
+                          <td className="px-4 py-3 max-w-xs"><div className="line-clamp-2 text-gray-600" title={req.requestBrief}>{req.requestBrief}</div></td>
+                          <td className="px-4 py-3 whitespace-nowrap">{req.expectedMoq || '-'}</td>
                           <td className="px-4 py-3 whitespace-nowrap">{(req.createdAt || '').slice(0, 10)}</td>
                           <td className="px-4 py-3">
                             <select

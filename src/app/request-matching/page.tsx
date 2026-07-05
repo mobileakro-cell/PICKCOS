@@ -12,17 +12,20 @@ export const dynamic = 'force-dynamic'
 
 const matchingSchema = z.object({
   requestType: z.enum(['brand_sourcing', 'oem_odm', 'ingredient', 'packaging', 'distribution']),
+  businessStage: z.enum(['new_brand', 'brand_expansion', 'distributor', 'other']),
   category: z.string().min(1, 'Select a category'),
-  conceptKeywords: z.string().min(3, 'Enter at least 3 characters'),
-  targetMarkets: z.array(z.string()).min(1, 'Select at least one market'),
-  certificationsNeeded: z.array(z.string()),
-  moqTarget: z.string().optional(),
+  requestBrief: z.string().min(10, 'Please describe your request (at least 10 characters)'),
+  serviceScope: z.enum(['formula_dev', 'existing_odm', 'formula_fill', 'full_package']),
+  expectedMoq: z.string().min(1, 'Select an expected order quantity'),
+  targetMarkets: z.array(z.string()).optional(),
+  certificationsNeeded: z.array(z.string()).optional(),
   timeline: z.string().optional(),
   ndaNeeded: z.boolean().default(false),
   companyName: z.string().min(2, 'Enter company name'),
   personName: z.string().min(2, 'Enter your name'),
   email: z.string().email('Enter valid email'),
   country: z.string().min(1, 'Select country'),
+  website: z.string().optional(),
   preferredChannel: z.enum(['Email', 'WhatsApp', 'WeChat']),
 })
 
@@ -34,6 +37,29 @@ const REQUEST_TYPES = [
   { value: 'ingredient', label: { en: 'Ingredient Sourcing', ko: '원료 소싱' } },
   { value: 'packaging', label: { en: 'Packaging Solution', ko: '패키징 솔루션' } },
   { value: 'distribution', label: { en: 'Distribution/Export', ko: '유통/수출' } },
+]
+
+const BUSINESS_STAGES = [
+  { value: 'new_brand', label: { en: 'Launching a new brand', ko: '신규 브랜드 런칭' } },
+  { value: 'brand_expansion', label: { en: 'Expanding an existing brand', ko: '기존 브랜드 라인 확장' } },
+  { value: 'distributor', label: { en: 'Distributor / Reseller', ko: '유통사 / 리셀러' } },
+  { value: 'other', label: { en: 'Other', ko: '기타' } },
+]
+
+const SERVICE_SCOPES = [
+  { value: 'formula_dev', label: { en: 'Formula development (full OEM)', ko: '처방 개발부터 (풀 OEM)' } },
+  { value: 'existing_odm', label: { en: 'Use existing formula (ODM)', ko: '기존 처방 활용 (ODM)' } },
+  { value: 'formula_fill', label: { en: 'Formula + filling', ko: '처방 + 충전' } },
+  { value: 'full_package', label: { en: 'Formula + packaging (full service)', ko: '처방 + 패키징 (풀서비스)' } },
+]
+
+const MOQ_RANGES = [
+  { value: 'under_1000', label: { en: 'Under 1,000 units', ko: '1,000개 미만' } },
+  { value: '1000_5000', label: { en: '1,000 – 5,000 units', ko: '1,000 – 5,000개' } },
+  { value: '5000_10000', label: { en: '5,000 – 10,000 units', ko: '5,000 – 10,000개' } },
+  { value: '10000_50000', label: { en: '10,000 – 50,000 units', ko: '10,000 – 50,000개' } },
+  { value: 'over_50000', label: { en: '50,000+ units', ko: '50,000개 이상' } },
+  { value: 'undecided', label: { en: 'Not sure yet (approx.)', ko: '미정 (대략)' } },
 ]
 
 const PRODUCT_CATEGORIES = [
@@ -194,6 +220,19 @@ function RequestMatchingPageContent() {
     }
   }
 
+  // 제출 시 검증 실패 → 첫 오류 필드가 있는 단계로 이동하고 안내 표시
+  const fieldStep: Record<string, number> = {
+    requestType: 1,
+    businessStage: 2, category: 2, requestBrief: 2, serviceScope: 2,
+    expectedMoq: 3,
+    companyName: 4, personName: 4, email: 4, country: 4, preferredChannel: 4,
+  }
+  const onError = (errs: Record<string, unknown>) => {
+    const first = Object.keys(errs)[0]
+    if (first && fieldStep[first]) setStep(fieldStep[first])
+    setSubmitError(lang === 'ko' ? '필수 항목을 확인해 주세요.' : 'Please complete the required fields.')
+  }
+
   if (successData) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-20">
@@ -329,7 +368,7 @@ function RequestMatchingPageContent() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
         {step === 1 && (
           <div className="space-y-4 mb-8">
             <h2 className="text-2xl font-bold mb-6">{t('matching.step1_title')}</h2>
@@ -355,8 +394,24 @@ function RequestMatchingPageContent() {
 
         {step === 2 && (
           <div className="space-y-6 mb-8">
-            <h2 className="text-2xl font-bold">{t('matching.step2_title')}</h2>
+            <h2 className="text-2xl font-bold">{lang === 'ko' ? '요청 개요' : 'About Your Request'}</h2>
 
+            {/* 사업 단계 · 바이어 유형 */}
+            <div>
+              <label className="block text-sm font-medium mb-2">{lang === 'ko' ? '사업 단계 · 바이어 유형' : 'Business Stage / Buyer Type'} *</label>
+              <select
+                {...register('businessStage')}
+                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
+              >
+                <option value="">{lang === 'ko' ? '선택하세요' : 'Select...'}</option>
+                {BUSINESS_STAGES.map(o => (
+                  <option key={o.value} value={o.value}>{o.label[lang]}</option>
+                ))}
+              </select>
+              {errors.businessStage && <p className="text-red-600 text-sm mt-1">{errors.businessStage.message}</p>}
+            </div>
+
+            {/* 제품 카테고리 */}
             <div>
               <label className="block text-sm font-medium mb-2">{t('matching.product_category')} *</label>
               <select
@@ -371,119 +426,114 @@ function RequestMatchingPageContent() {
               {errors.category && <p className="text-red-600 text-sm mt-1">{errors.category.message}</p>}
             </div>
 
+            {/* 요청 브리프 (자유서술) */}
             <div>
-              <label className="block text-sm font-medium mb-2">{t('matching.concept_keywords')} *</label>
-              <input
-                type="text"
-                placeholder={t('matching.concept_placeholder')}
-                {...register('conceptKeywords')}
+              <label className="block text-sm font-medium mb-1">{lang === 'ko' ? '요청 브리프' : 'Request Brief'} *</label>
+              <p className="text-xs text-gray-500 mb-2">
+                {lang === 'ko'
+                  ? '어떤 제품·원료를 찾으시나요? 용도와 원하는 방향을 편하게 적어주세요.'
+                  : 'What are you looking for? Describe the purpose and direction in your own words.'}
+              </p>
+              <textarea
+                rows={4}
+                placeholder={lang === 'ko'
+                  ? '예: 미국 시장용 비건 안티에이징 세럼을 OEM으로 개발하고 싶어요. 중저가 라인, 자연유래 성분 위주.'
+                  : 'e.g., We want to develop a vegan anti-aging serum via OEM for the US market — mid-tier price, naturally-derived ingredients.'}
+                {...register('requestBrief')}
                 className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
               />
-              {errors.conceptKeywords && (
-                <p className="text-red-600 text-sm mt-1">{errors.conceptKeywords.message}</p>
-              )}
+              {errors.requestBrief && <p className="text-red-600 text-sm mt-1">{errors.requestBrief.message}</p>}
             </div>
 
+            {/* 서비스 범위 */}
             <div>
-              <label className="block text-sm font-medium mb-2">{t('matching.target_markets')} *</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {TARGET_MARKETS.map(market => (
-                  <label key={market} className="flex items-center p-2 border rounded hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      value={market}
-                      {...register('targetMarkets')}
-                      className="w-4 h-4"
-                    />
-                    <span className="ml-2 text-sm">{market}</span>
-                  </label>
+              <label className="block text-sm font-medium mb-2">{lang === 'ko' ? '서비스 범위' : 'Service Scope'} *</label>
+              <select
+                {...register('serviceScope')}
+                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
+              >
+                <option value="">{lang === 'ko' ? '어디까지 맡기실까요?' : 'How much should the supplier handle?'}</option>
+                {SERVICE_SCOPES.map(o => (
+                  <option key={o.value} value={o.value}>{o.label[lang]}</option>
                 ))}
-              </div>
-              {errors.targetMarkets && (
-                <p className="text-red-600 text-sm mt-1">{errors.targetMarkets.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('matching.certifications_needed')}</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {CERTIFICATIONS.map(cert => (
-                  <label key={cert} className="flex items-center p-2 border rounded hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      value={cert}
-                      {...register('certificationsNeeded')}
-                      className="w-4 h-4"
-                    />
-                    <span className="ml-2 text-sm">{cert}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('matching.moq_target')}</label>
-                <input
-                  type="text"
-                  placeholder={t('matching.moq_placeholder')}
-                  {...register('moqTarget')}
-                  className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('matching.timeline')}</label>
-                <select
-                  {...register('timeline')}
-                  className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
-                >
-                  <option value="">{t('matching.select_timeline')}</option>
-                  <option value="urgent">{t('matching.timeline_urgent')}</option>
-                  <option value="soon">{t('matching.timeline_soon')}</option>
-                  <option value="flexible">{t('matching.timeline_flexible')}</option>
-                </select>
-              </div>
+              </select>
+              {errors.serviceScope && <p className="text-red-600 text-sm mt-1">{errors.serviceScope.message}</p>}
             </div>
           </div>
         )}
 
         {step === 3 && (
           <div className="space-y-6 mb-8">
-            <h2 className="text-2xl font-bold">{t('matching.step3_title')}</h2>
+            <h2 className="text-2xl font-bold">{lang === 'ko' ? '규모 · 요건' : 'Scale & Requirements'}</h2>
 
+            {/* 예상 주문 수량 (MOQ) — 필수 */}
             <div>
-              <label className="block text-sm font-medium mb-2">{t('matching.upload_files')}</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <p className="text-gray-600 mb-4">{t('matching.drag_drop')}</p>
-                <input
-                  type="file"
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label
-                  htmlFor="file-upload"
-                  className="inline-block px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded cursor-pointer transition-colors"
-                >
-                  {t('matching.choose_files')}
-                </label>
-                <p className="text-xs text-gray-500 mt-4">{t('matching.file_types')}</p>
+              <label className="block text-sm font-medium mb-2">{lang === 'ko' ? '예상 주문 수량 (MOQ)' : 'Expected Order Quantity (MOQ)'} *</label>
+              <select
+                {...register('expectedMoq')}
+                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
+              >
+                <option value="">{lang === 'ko' ? '대략적인 규모를 선택하세요' : 'Select an approximate volume'}</option>
+                {MOQ_RANGES.map(o => (
+                  <option key={o.value} value={o.value}>{o.label[lang]}</option>
+                ))}
+              </select>
+              {errors.expectedMoq && <p className="text-red-600 text-sm mt-1">{errors.expectedMoq.message}</p>}
+            </div>
+
+            {/* 희망 일정 (선택) */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {t('matching.timeline')} <span className="font-normal text-gray-400">({lang === 'ko' ? '선택' : 'optional'})</span>
+              </label>
+              <select
+                {...register('timeline')}
+                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
+              >
+                <option value="">{t('matching.select_timeline')}</option>
+                <option value="urgent">{t('matching.timeline_urgent')}</option>
+                <option value="soon">{t('matching.timeline_soon')}</option>
+                <option value="flexible">{t('matching.timeline_flexible')}</option>
+              </select>
+            </div>
+
+            {/* 타겟 시장 (선택) */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {t('matching.target_markets')} <span className="font-normal text-gray-400">({lang === 'ko' ? '선택' : 'optional'})</span>
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {TARGET_MARKETS.map(market => (
+                  <label key={market} className="flex items-center p-2 border rounded hover:bg-gray-50">
+                    <input type="checkbox" value={market} {...register('targetMarkets')} className="w-4 h-4" />
+                    <span className="ml-2 text-sm">{market}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
+            {/* 필요 인증 (선택) */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {t('matching.certifications_needed')} <span className="font-normal text-gray-400">({lang === 'ko' ? '선택' : 'optional'})</span>
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {CERTIFICATIONS.map(cert => (
+                  <label key={cert} className="flex items-center p-2 border rounded hover:bg-gray-50">
+                    <input type="checkbox" value={cert} {...register('certificationsNeeded')} className="w-4 h-4" />
+                    <span className="ml-2 text-sm">{cert}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* NDA */}
             <div>
               <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="checkbox"
-                  {...register('ndaNeeded')}
-                  className="w-5 h-5"
-                />
-                <span className="ml-3 font-medium">
-                  {t('matching.nda_needed')}
-                </span>
+                <input type="checkbox" {...register('ndaNeeded')} className="w-5 h-5" />
+                <span className="ml-3 font-medium">{t('matching.nda_needed')}</span>
               </label>
-              <p className="text-sm text-gray-600 mt-2">
-                {t('matching.nda_desc')}
-              </p>
+              <p className="text-sm text-gray-600 mt-2">{t('matching.nda_desc')}</p>
             </div>
           </div>
         )}
@@ -542,6 +592,18 @@ function RequestMatchingPageContent() {
               {errors.country && (
                 <p className="text-red-600 text-sm mt-1">{errors.country.message}</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {lang === 'ko' ? '회사 웹사이트 · 브랜드 링크' : 'Company Website / Brand Link'} <span className="font-normal text-gray-400">({lang === 'ko' ? '선택' : 'optional'})</span>
+              </label>
+              <input
+                type="text"
+                placeholder="https://"
+                {...register('website')}
+                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#3d3d3d]"
+              />
             </div>
 
             <div>

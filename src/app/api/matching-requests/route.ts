@@ -5,17 +5,20 @@ import { getAdmin } from '@/lib/auth'
 interface MatchingRequest {
   id: string
   requestType: string
+  businessStage: string
   category: string
-  conceptKeywords: string
-  targetMarkets: string[]
-  certificationsNeeded: string[]
-  moqTarget?: string
+  requestBrief: string
+  serviceScope: string
+  expectedMoq: string
+  targetMarkets?: string[]
+  certificationsNeeded?: string[]
   timeline?: string
   ndaNeeded: boolean
   companyName: string
   personName: string
   email: string
   country: string
+  website?: string
   preferredChannel: string
   supplierId?: string
   topic?: string
@@ -36,24 +39,27 @@ export async function POST(request: NextRequest) {
 
     const {
       requestType,
+      businessStage,
       category,
-      conceptKeywords,
+      requestBrief,
+      serviceScope,
+      expectedMoq,
       targetMarkets,
       certificationsNeeded,
-      moqTarget,
       timeline,
       ndaNeeded,
       companyName,
       personName,
       email,
       country,
+      website,
       preferredChannel,
       supplierId,
       topic,
     } = body
 
     // Validation
-    if (!requestType || !category || !conceptKeywords || !targetMarkets?.length) {
+    if (!requestType || !businessStage || !category || !requestBrief || !serviceScope || !expectedMoq) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -75,17 +81,20 @@ export async function POST(request: NextRequest) {
     const newRequest: MatchingRequest = {
       id: requestId,
       requestType,
+      businessStage,
       category,
-      conceptKeywords,
-      targetMarkets,
-      certificationsNeeded,
-      moqTarget,
+      requestBrief,
+      serviceScope,
+      expectedMoq,
+      targetMarkets: targetMarkets || [],
+      certificationsNeeded: certificationsNeeded || [],
       timeline,
-      ndaNeeded,
+      ndaNeeded: !!ndaNeeded,
       companyName,
       personName,
       email,
       country,
+      website,
       preferredChannel,
       supplierId,
       topic,
