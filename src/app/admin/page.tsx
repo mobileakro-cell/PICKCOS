@@ -860,6 +860,9 @@ export default function AdminPage() {
               <Link href="/admin/mvp" className="px-4 py-2 bg-white/20 text-white font-semibold rounded hover:bg-white/30 text-sm">
                 🎯 MVP
               </Link>
+              <Link href="/admin/whitepaper" className="px-4 py-2 bg-white/20 text-white font-semibold rounded hover:bg-white/30 text-sm">
+                📄 백서
+              </Link>
               <button onClick={() => setShowForms(true)} className="px-4 py-2 bg-white/20 text-white font-semibold rounded hover:bg-white/30 text-sm">
                 📋 양식
               </button>
