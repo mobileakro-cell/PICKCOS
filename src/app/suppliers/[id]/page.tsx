@@ -279,9 +279,10 @@ export default function SupplierDetailPage({ params }: { params: { id: string } 
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12">
             <div>
               <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-mocha-gray mb-4">{t('supplier.about')}</h3>
-              <p className="text-mocha-gray leading-relaxed mb-10">
-                {supplier.descriptionFull?.[lang] || supplier.description[lang]}
-              </p>
+              <div
+                className="text-mocha-gray leading-relaxed mb-10 [&_b]:font-bold [&_font[size='6']]:text-2xl [&_font[size='5']]:text-xl [&_font[size='4']]:text-base [&_font[size='2']]:text-xs"
+                dangerouslySetInnerHTML={{ __html: supplier.descriptionFull?.[lang] || supplier.description[lang] || '' }}
+              />
 
               {coreStrengths.length > 0 && (
                 <div>

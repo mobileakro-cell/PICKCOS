@@ -7,6 +7,7 @@ import { bl, blArr, SUPPLIER_TYPES, PRODUCT_CATEGORIES } from '@/lib/types'
 import { parseCSV, toCSV, SUPPLIER_HEADERS, supplierToRow, rowToSupplier, EXHIBITION_HEADERS, exhibitionToRow, rowToExhibition } from '@/lib/csv'
 import { COUNTRY_OPTIONS, MOQ_RANGE_OPTIONS, LEADTIME_RANGE_OPTIONS, CERTIFICATION_OPTIONS, EXPORT_MARKET_OPTIONS } from '@/lib/options'
 import { CURATION_DIMENSIONS, computeCurationTotal, curationBadge, CURATION_VERIFIED_THRESHOLD } from '@/lib/curation'
+import RichText from '@/components/RichText'
 
 // Trigger a CSV file download (BOM prefix so Excel reads Korean correctly)
 function downloadCSV(filename: string, text: string) {
@@ -1304,9 +1305,9 @@ export default function AdminPage() {
       {/* =================== Supplier Modal =================== */}
       {modalType === 'supplier' && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setModalType(null)}>
-          <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[92vh] overflow-y-auto p-8" onClick={e => e.stopPropagation()}>
             <h2 className="text-2xl font-bold mb-6">{modalMode === 'add' ? '공급사 추가' : '공급사 수정'}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {/* ── 기본 정보 ── */}
               <div className="md:col-span-2 mt-2 mb-1 text-sm font-semibold text-gray-500">기본 정보</div>
               <div>
@@ -1403,7 +1404,19 @@ export default function AdminPage() {
               {/* ── 상세 설명 ── */}
               <div className="md:col-span-2 mt-4 mb-1 text-sm font-semibold text-gray-500">상세 설명</div>
               <BilingualInput label="짧은 설명" value={editingSupplier.description || emptyBL} onChange={v => setEditingSupplier({ ...editingSupplier, description: v })} />
-              <BilingualInput label="상세 설명" value={editingSupplier.descriptionFull || emptyBL} onChange={v => setEditingSupplier({ ...editingSupplier, descriptionFull: v })} multiline />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">상세 설명 <span className="font-normal text-gray-400 text-xs">· 글자수 제한 없음 · 볼드·크기·정렬 가능</span></label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">KO (국문)</div>
+                    <RichText value={editingSupplier.descriptionFull?.ko || ''} onChange={html => setEditingSupplier({ ...editingSupplier, descriptionFull: { ...(editingSupplier.descriptionFull || emptyBL), ko: html } })} placeholder="상세 소개를 자유롭게 작성하세요" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">EN (영문)</div>
+                    <RichText value={editingSupplier.descriptionFull?.en || ''} onChange={html => setEditingSupplier({ ...editingSupplier, descriptionFull: { ...(editingSupplier.descriptionFull || emptyBL), en: html } })} placeholder="Write the full description freely" />
+                  </div>
+                </div>
+              </div>
 
               {/* ── 인증·역량·시장 ── */}
               <div className="md:col-span-2 mt-4 mb-1 text-sm font-semibold text-gray-500">인증·역량·시장</div>
@@ -1526,9 +1539,9 @@ export default function AdminPage() {
       {/* =================== Article Modal =================== */}
       {modalType === 'article' && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setModalType(null)}>
-          <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[92vh] overflow-y-auto p-8" onClick={e => e.stopPropagation()}>
             <h2 className="text-2xl font-bold mb-6">{modalMode === 'add' ? '기사 추가' : '기사 수정'}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <BilingualInput label="제목" value={editingArticle.title || emptyBL} onChange={v => setEditingArticle({ ...editingArticle, title: v })} required />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">슬러그 (비우면 자동생성)</label>
@@ -1574,7 +1587,19 @@ export default function AdminPage() {
                 )}
               </div>
               <BilingualInput label="요약" value={editingArticle.summary || emptyBL} onChange={v => setEditingArticle({ ...editingArticle, summary: v })} required multiline />
-              <BilingualInput label="본문" value={editingArticle.content || emptyBL} onChange={v => setEditingArticle({ ...editingArticle, content: v })} multiline />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">본문 <span className="font-normal text-gray-400 text-xs">· 글자수 제한 없음 · 볼드·크기·정렬 가능</span></label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">KO (국문)</div>
+                    <RichText value={editingArticle.content?.ko || ''} onChange={html => setEditingArticle({ ...editingArticle, content: { ...(editingArticle.content || emptyBL), ko: html } })} placeholder="기사 본문을 작성하세요" minHeight={240} />
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">EN (영문)</div>
+                    <RichText value={editingArticle.content?.en || ''} onChange={html => setEditingArticle({ ...editingArticle, content: { ...(editingArticle.content || emptyBL), en: html } })} placeholder="Write the article body" minHeight={240} />
+                  </div>
+                </div>
+              </div>
               <BilingualArrayInput label="태그" value={editingArticle.tags || emptyBLArr} onChange={v => setEditingArticle({ ...editingArticle, tags: v })} />
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">관련 공급사 ID (쉼표로 구분)</label>
@@ -1603,9 +1628,9 @@ export default function AdminPage() {
       {/* =================== Exhibition Modal =================== */}
       {modalType === 'exhibition' && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setModalType(null)}>
-          <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[92vh] overflow-y-auto p-8" onClick={e => e.stopPropagation()}>
             <h2 className="text-2xl font-bold mb-6">{modalMode === 'add' ? '전시 추가' : '전시 수정'}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <BilingualInput label="전시명" value={editingExhibition.title || emptyBL} onChange={v => setEditingExhibition({ ...editingExhibition, title: v })} required />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">기간</label>
@@ -1641,7 +1666,19 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
-              <BilingualInput label="설명" value={editingExhibition.description || emptyBL} onChange={v => setEditingExhibition({ ...editingExhibition, description: v })} multiline />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">설명 <span className="font-normal text-gray-400 text-xs">· 글자수 제한 없음 · 볼드·크기·정렬 가능</span></label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">KO (국문)</div>
+                    <RichText value={editingExhibition.description?.ko || ''} onChange={html => setEditingExhibition({ ...editingExhibition, description: { ...(editingExhibition.description || emptyBL), ko: html } })} placeholder="전시 설명을 작성하세요" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">EN (영문)</div>
+                    <RichText value={editingExhibition.description?.en || ''} onChange={html => setEditingExhibition({ ...editingExhibition, description: { ...(editingExhibition.description || emptyBL), en: html } })} placeholder="Write the exhibition description" />
+                  </div>
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">참가 공급사 ID (쉼표로 구분)</label>
                 <input type="text" value={arrToComma(editingExhibition.supplierIds)} onChange={e => setEditingExhibition({ ...editingExhibition, supplierIds: commaToArr(e.target.value) })} className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-primary" placeholder="1, 2, 3" />

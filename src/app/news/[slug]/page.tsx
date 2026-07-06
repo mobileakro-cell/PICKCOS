@@ -216,6 +216,14 @@ export default function ArticleDetailPage({ params }: { params: { slug: string }
           ))}
         </div>
 
+        {/* Rich 본문 (관리자 편집기 작성) */}
+        {article.content?.[lang] && (
+          <div
+            className="mb-16 leading-[1.9] text-charcoal/85 [&_b]:font-bold [&_p]:mb-4 [&_font[size='6']]:text-2xl [&_font[size='5']]:text-xl [&_font[size='4']]:text-base [&_font[size='2']]:text-sm"
+            dangerouslySetInnerHTML={{ __html: article.content[lang] }}
+          />
+        )}
+
         {/* Tags */}
         {article.tags[lang].length > 0 && (
           <div className="flex flex-wrap gap-2 mb-16 pt-8 border-t border-border">

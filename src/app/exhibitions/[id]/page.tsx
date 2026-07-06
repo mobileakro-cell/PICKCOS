@@ -173,7 +173,10 @@ export default function ExhibitionDetailPage({ params }: { params: { id: string 
       <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="max-w-3xl">
           <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-mocha-gray mb-4">{t('exhibition.about_this')}</h2>
-          <p className="text-mocha-gray leading-relaxed text-lg font-light">{exhibition.description[lang]}</p>
+          <div
+            className="text-mocha-gray leading-relaxed text-lg font-light [&_b]:font-bold [&_p]:mb-4 [&_font[size='6']]:text-2xl [&_font[size='5']]:text-xl [&_font[size='4']]:text-base [&_font[size='2']]:text-sm"
+            dangerouslySetInnerHTML={{ __html: exhibition.description[lang] || '' }}
+          />
         </div>
       </div>
 
